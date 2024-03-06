@@ -1,40 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/screens/GetCode.dart'; // Importer la page GetCode
+import 'package:mira/screens/login.dart';
+import 'package:mira/utils/animations.dart';
 
-class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({Key? key}) : super(key: key);
+class GetCodePage extends StatefulWidget {
+  const GetCodePage({Key? key}) : super(key: key);
 
   @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
+  State<GetCodePage> createState() => _GetCodePageState();
 }
 
-class _ForgotPasswordState extends State<ForgotPassword>
+class _GetCodePageState extends State<GetCodePage>
     with TickerProviderStateMixin {
-  TextEditingController emailAddressController = TextEditingController();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final animationsMap = AnimationHelper.animationsMap;
 
-  // Méthode pour valider l'e-mail
-  String? validateEmail(String? email) {
-    if (email == null || email.isEmpty) {
-      return 'Veuillez entrer votre adresse e-mail';
+  final List<TextEditingController> controllers =
+      List.generate(8, (_) => TextEditingController());
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    for (var controller in controllers) {
+      controller.dispose();
     }
-
-    String pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regExp = RegExp(pattern);
-    if (!regExp.hasMatch(email)) {
-      return 'Veuillez entrer une adresse e-mail valide';
-    }
-
-    return null; // L'e-mail est valide
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         body: Container(
           height: double.infinity,
@@ -107,11 +117,34 @@ class _ForgotPasswordState extends State<ForgotPassword>
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                FlutterFlowIconButton(
+                                  borderColor: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  borderRadius: 12,
+                                  borderWidth: 1,
+                                  buttonSize: 40,
+                                  fillColor: FlutterFlowTheme.of(context)
+                                      .secondaryBackground,
+                                  icon: Icon(
+                                    Icons.arrow_back_rounded,
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    size: 24,
+                                  ),
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ].divide(SizedBox(width: 12)),
+                            ),
                             Padding(
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
                               child: Text(
-                                'Mot de passe oublié',
+                                'Récupération du compte',
                                 textAlign: TextAlign.center,
                                 style:
                                     FlutterFlowTheme.of(context).displaySmall,
@@ -121,7 +154,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
                               padding:
                                   EdgeInsetsDirectional.fromSTEB(0, 8, 0, 24),
                               child: Text(
-                                'Veuillez remplir votre e-mail ci-dessous afin de recevoir un lien de réinitialisation du mot de passe.',
+                                'Veuillez remplir le code afin de récupérer votre compte',
                                 textAlign: TextAlign.start,
                                 style: FlutterFlowTheme.of(context).labelLarge,
                               ),
@@ -132,12 +165,11 @@ class _ForgotPasswordState extends State<ForgotPassword>
                               child: Container(
                                 width: double.infinity,
                                 child: TextFormField(
-                                  controller: emailAddressController,
                                   autofocus: false,
                                   autofillHints: [AutofillHints.email],
                                   obscureText: false,
                                   decoration: InputDecoration(
-                                    labelText: 'Email',
+                                    labelText: 'Code',
                                     labelStyle:
                                         FlutterFlowTheme.of(context).labelLarge,
                                     enabledBorder: OutlineInputBorder(
@@ -180,7 +212,9 @@ class _ForgotPasswordState extends State<ForgotPassword>
                                   keyboardType: TextInputType.emailAddress,
                                   cursorColor:
                                       FlutterFlowTheme.of(context).primary,
-                                  validator: (value) => validateEmail(value),
+                                  // validator: _model
+                                  //     .emailAddressControllerValidator
+                                  //     .asValidator(context),
                                 ),
                               ),
                             ),
@@ -189,20 +223,20 @@ class _ForgotPasswordState extends State<ForgotPassword>
                                   EdgeInsetsDirectional.fromSTEB(0, 0, 0, 16),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  String? emailValidationResult = validateEmail(
-                                      emailAddressController.text);
-                                  if (emailValidationResult != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(emailValidationResult),
-                                      ),
-                                    );
-                                    return; // Arrêter l'exécution si l'e-mail n'est pas valide
-                                  }
-
-                                  // L'e-mail est valide, naviguer vers la page GetCodePage
+                                  // if (_model
+                                  //     .emailAddressController.text.isEmpty) {
+                                  //   ScaffoldMessenger.of(context).showSnackBar(
+                                  //     SnackBar(
+                                  //       content: Text(
+                                  //         'Veilley remplir le champ',
+                                  //       ),
+                                  //   ),
+                                  //);
+                                  //return;
+                                  //}
+                                  // Redirection vers la page GetCode
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => GetCodePage(),
+                                    builder: (context) => LoginPage(),
                                   ));
                                 },
                                 text: 'Envoyer',
@@ -233,7 +267,8 @@ class _ForgotPasswordState extends State<ForgotPassword>
                         ),
                       ),
                     ),
-                  ),
+                  ).animateOnPageLoad(
+                      animationsMap['containerOnPageLoadAnimation']!),
                 ),
               ],
             ),

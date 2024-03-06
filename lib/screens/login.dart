@@ -1,14 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 // Importations locales
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/models/login_model.dart';
 import 'package:mira/screens/Forgetpassword.dart';
 import 'package:mira/screens/signup.dart';
-import 'package:mira/utils/validators.dart';
+import 'package:mira/utils/animations.dart';
 
 export 'package:mira/models/login_model.dart';
 
@@ -22,50 +21,15 @@ class LoginPage extends StatefulWidget {
 class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
   late LoginModelPage _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final animationsMap = {
-    'containerOnPageLoadAnimation': AnimationInfo(
-      trigger: AnimationTrigger.onPageLoad,
-      effects: [
-        VisibilityEffect(duration: 1.milliseconds),
-        FadeEffect(
-          curve: Curves.easeInOut,
-          delay: 0.milliseconds,
-          duration: 300.milliseconds,
-          begin: 0,
-          end: 1,
-        ),
-        MoveEffect(
-          curve: Curves.easeInOut,
-          delay: 0.milliseconds,
-          duration: 300.milliseconds,
-          begin: Offset(0, 140),
-          end: Offset(0, 0),
-        ),
-        ScaleEffect(
-          curve: Curves.easeInOut,
-          delay: 0.milliseconds,
-          duration: 300.milliseconds,
-          begin: Offset(0.9, 0.9),
-          end: Offset(1, 1),
-        ),
-        TiltEffect(
-          curve: Curves.easeInOut,
-          delay: 0.milliseconds,
-          duration: 300.milliseconds,
-          begin: Offset(-0.349, 0),
-          end: Offset(0, 0),
-        ),
-      ],
-    ),
-  };
+  final animationsMap = AnimationHelper.animationsMap;
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => LoginModelPage());
     _model.initState(context);
-    _model.emailAddressController ??= TextEditingController();
-    _model.emailAddressFocusNode ??= FocusNode();
+    _model.cinController ??= TextEditingController();
+    _model.cinFocusNode ??= FocusNode();
 
     _model.passwordController ??= TextEditingController();
     _model.passwordFocusNode ??= FocusNode();
@@ -131,7 +95,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                             ),
                             alignment: AlignmentDirectional(0, 0),
                             child: Text(
-                              'Mira',
+                              'MIRA',
                               style: FlutterFlowTheme.of(context)
                                   .displaySmall
                                   .override(
@@ -190,12 +154,10 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                       child: Container(
                                         width: double.infinity,
                                         child: TextFormField(
-                                          controller:
-                                              _model.emailAddressController,
-                                          focusNode:
-                                              _model.emailAddressFocusNode,
-                                          autofocus: true,
-                                          autofillHints: [AutofillHints.email],
+                                          autofocus: false,
+                                          autofillHints: [
+                                            AutofillHints.telephoneNumber
+                                          ],
                                           obscureText: false,
                                           decoration: InputDecoration(
                                             labelText: 'CIN',
@@ -251,8 +213,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                           style: FlutterFlowTheme.of(context)
                                               .bodyLarge,
                                           keyboardType: TextInputType.number,
-                                          validator:
-                                              validateCIN, // Utiliser la fonction de validation ici
+                                          // Utiliser la fonction de validation ici
                                         ),
                                       ),
                                     ),
@@ -264,7 +225,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                         child: TextFormField(
                                           controller: _model.passwordController,
                                           focusNode: _model.passwordFocusNode,
-                                          autofocus: true,
+                                          autofocus: false,
                                           autofillHints: [
                                             AutofillHints.password
                                           ],
@@ -387,53 +348,6 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: 'Mot de passe oublié? ',
-                                              style: TextStyle(),
-                                            ),
-                                            WidgetSpan(
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ForgotPassword(),
-                                                    ),
-                                                  );
-                                                },
-                                                child: Text(
-                                                  'Cliquez ici',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primary,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                ),
-                                              ),
-                                            ),
-                                            TextSpan(
-                                              text: ' ',
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0, 12, 0, 12),
-                                      child: RichText(
-                                        textScaleFactor: MediaQuery.of(context)
-                                            .textScaleFactor,
-                                        text: TextSpan(
-                                          children: [
-                                            TextSpan(
                                               text:
                                                   'Vous n\'avez pas de compte ? ',
                                               style: TextStyle(),
@@ -474,6 +388,53 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                         ),
                                       ),
                                     ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0, 16, 0, 0),
+                                      child: FFButtonWidget(
+                                        onPressed: () async {
+                                          // Redirection vers la page d'inscription
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                ForgotPassword(),
+                                          ));
+                                        },
+                                        text: 'Mot de passe oublié?',
+                                        options: FFButtonOptions(
+                                          width: double.infinity,
+                                          height: 44,
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 0, 0, 0),
+                                          iconPadding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0, 0, 0, 0),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryBackground,
+                                          textStyle: FlutterFlowTheme.of(
+                                                  context)
+                                              .titleSmall
+                                              .override(
+                                                fontFamily: 'Readex Pro',
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                              ),
+                                          elevation: 0,
+                                          borderSide: BorderSide(
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryBackground,
+                                            width: 2,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          hoverColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .primaryBackground,
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),

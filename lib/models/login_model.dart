@@ -7,9 +7,9 @@ class LoginModelPage extends FlutterFlowModel<LoginPage> {
 
   final unfocusNode = FocusNode();
   // State field(s) for emailAddress widget.
-  FocusNode? emailAddressFocusNode;
-  TextEditingController? emailAddressController;
-  String? Function(BuildContext, String?)? emailAddressControllerValidator;
+  FocusNode? cinFocusNode;
+  TextEditingController? cinController;
+  String? Function(BuildContext, String?)? cinControllerValidator;
   // State field(s) for password widget.
   FocusNode? passwordFocusNode;
   TextEditingController? passwordController;
@@ -24,8 +24,8 @@ class LoginModelPage extends FlutterFlowModel<LoginPage> {
 
   void dispose() {
     unfocusNode.dispose();
-    emailAddressFocusNode?.dispose();
-    emailAddressController?.dispose();
+    cinFocusNode?.dispose();
+    cinController?.dispose();
 
     passwordFocusNode?.dispose();
     passwordController?.dispose();
