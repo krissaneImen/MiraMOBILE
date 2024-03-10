@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/screens/login.dart';
-import 'package:mira/utils/animations.dart';
+import 'package:mira/Screens/login.dart';
+import 'package:mira/Utils/animations.dart';
 
 class GetCodePage extends StatefulWidget {
   const GetCodePage({Key? key}) : super(key: key);

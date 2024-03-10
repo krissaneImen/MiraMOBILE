@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/screens/Forgetpassword.dart';
+import 'package:mira/Screens/Forgetpassword.dart';
 
 class ForgotPasswordModel extends FlutterFlowModel<ForgotPassword> {
   ///  State fields for stateful widgets in this page.

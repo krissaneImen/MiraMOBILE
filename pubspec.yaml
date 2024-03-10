@@ -75,12 +75,17 @@ dependencies:
   country_icons: ^3.0.0
   flutter_launcher_icons: ^0.13.1
   animated_splash_screen: ^1.1.0-nullsafety.0
+  libphonenumber_web: ^0.3.2
+  libphonenumber_plugin: ^0.3.3
+  intl_phone_number_input: ^0.7.4
+  flutter_localization: ^0.2.0
+  country_code_picker: ^3.0.0
+  phone_form_field: ^9.1.0
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  intl_phone_number_input: ^0.7.0
 
 flutter_icons:
   android: true
@@ -100,9 +105,11 @@ flutter_icons:
 
 # The following section is specific to Flutter packages.
 flutter:
+
   assets:
     - assets/logo.png
-
+   
+  
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

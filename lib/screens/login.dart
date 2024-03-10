@@ -5,9 +5,9 @@ import 'package:flutter/services.dart';
 // Importations locales
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/models/login_model.dart';
-import 'package:mira/screens/Forgetpassword.dart';
-import 'package:mira/screens/signup.dart';
-import 'package:mira/utils/animations.dart';
+import 'package:mira/Screens/Forgetpassword.dart';
+import 'package:mira/Screens/signup.dart';
+import 'package:mira/Utils/animations.dart';
 
 export 'package:mira/models/login_model.dart';
 

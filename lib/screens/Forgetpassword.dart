@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/screens/GetCode.dart'; // Importer la page GetCode
+import 'package:mira/Screens/GetCode.dart'; // Importer la page GetCode
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);

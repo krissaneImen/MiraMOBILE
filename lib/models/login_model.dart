@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/screens/login.dart';
+import 'package:mira/Screens/login.dart';
 
 class LoginModelPage extends FlutterFlowModel<LoginPage> {
   ///  State fields for stateful widgets in this page.
