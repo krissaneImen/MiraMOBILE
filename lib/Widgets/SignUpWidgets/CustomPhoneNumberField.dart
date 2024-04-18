@@ -23,7 +23,7 @@ class _CustomPhoneNumberFieldState extends State<CustomPhoneNumberField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 20),
       child: IntlPhoneField(
         controller: widget.controller,
         decoration: InputDecoration(

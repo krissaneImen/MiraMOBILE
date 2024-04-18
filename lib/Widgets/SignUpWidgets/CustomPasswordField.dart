@@ -71,7 +71,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Color(0xFFE0E3E7),
+                  color: Colors.red,
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -93,11 +93,14 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                   size: 24,
                 ),
               ),
+              errorMaxLines:
+                  3, // Permet d'afficher plusieurs lignes pour le message d'erreur
               errorText: _password != null && !_isPasswordStrong
                   ? 'Votre mot de passe doit contenir au moins 8 caractères avec des lettres majuscules, minuscules, des chiffres et des caractères spéciaux.'
                   : null,
             ),
           ),
+          SizedBox(height: 8), // Ajoute un espacement vertical entre les champs
           if (_password != null && _password!.isNotEmpty)
             TextFormField(
               onChanged: (confirmPassword) {
@@ -109,7 +112,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
               obscureText: _isObscured,
               decoration: InputDecoration(
                 labelText: 'Confirmer le mot de passe',
-                labelStyle: Theme.of(context).textTheme.subtitle1?.copyWith(
+                labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
                       fontSize: 16,
@@ -131,7 +134,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
                 ),
                 errorBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color(0xFFE0E3E7),
+                    color: Colors.red,
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -179,7 +182,7 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
     final hasLowercase = password.contains(RegExp(r'[a-z]'));
     final hasDigits = password.contains(RegExp(r'[0-9]'));
     final hasSpecialCharacters =
-        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>-]'));
 
     return password.length >= minLength &&
         hasUppercase &&

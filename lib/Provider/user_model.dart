@@ -1,8 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:mira/Screens/acceuil.dart';
+import 'package:mira/Screens/AuthScreens/login.dart';
 
 class UserModel extends ChangeNotifier {
+  late String? _selectedRole;
+  late String statut = '';
+  late String _firstName = '';
+  late String _lastName = '';
   late bool passwordVisibility;
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -10,10 +17,12 @@ class UserModel extends ChangeNotifier {
   late TextEditingController _dateDeDelivranceController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
-  late TextEditingController _statutController;
+  late TextEditingController
+      _statutController; // Ajout du contrôleur pour le champ "statut"
   late TextEditingController _passwordController;
   late TextEditingController _resetPasswordController;
   late Function(String) _showSnackBar;
+  late String _photoBase64;
 
   UserModel(this._showSnackBar) {
     passwordVisibility = false;
@@ -23,9 +32,14 @@ class UserModel extends ChangeNotifier {
     _dateDeDelivranceController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
-    _statutController = TextEditingController();
+    _statutController =
+        TextEditingController(); // Initialisation du contrôleur pour le champ "statut"
     _passwordController = TextEditingController();
     _resetPasswordController = TextEditingController();
+  }
+  void setSelectedRole(String? role) {
+    _selectedRole = role;
+    notifyListeners();
   }
 
   TextEditingController get firstNameController => _firstNameController;
@@ -38,74 +52,80 @@ class UserModel extends ChangeNotifier {
   TextEditingController get statutController => _statutController;
   TextEditingController get passwordController => _passwordController;
   TextEditingController get resetPasswordController => _resetPasswordController;
+  String? getPhotoBase64() => _photoBase64;
+//Connexion
+  Future<void> loginUser(BuildContext context) async {
+    try {
+      var url = Uri.parse('http://127.0.0.1:8000/users/login/');
+      var headers = {'Content-Type': 'application/json'};
+      var body = json.encode({
+        'cin': _cinController.text,
+        'password': _passwordController.text,
+      });
+
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        var userData = json.decode(response.body);
+
+        _firstName = userData['firstName'] ?? '';
+        _lastName = userData['lastName'] ?? '';
+        statut = userData['statut'] ?? '';
+        notifyListeners();
+        print('Prénom: $_firstName');
+        print('Nom: $_lastName');
+        print('Statut: $statut');
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => Accueil(userModel: this),
+        ));
+      } else {
+        String errorMessage = response.body.isEmpty
+            ? 'Erreur inconnue lors de la connexion'
+            : response.body;
+        throw Exception(
+            'Erreur lors de la connexion: ${response.statusCode} - $errorMessage');
+      }
+    } catch (e) {
+      _showSnackBar(e.toString());
+    }
+  }
 
   Future<void> registerUser(BuildContext context) async {
     try {
-      // Effectuez les validations sur les champs du formulaire
-      if (_firstNameController.text.isEmpty ||
-          _lastNameController.text.isEmpty ||
-          _cinController.text.isEmpty ||
-          _dateDeDelivranceController.text.isEmpty ||
-          _emailController.text.isEmpty ||
-          _phoneNumberController.text.isEmpty ||
-          _statutController.text.isEmpty ||
-          _passwordController.text.isEmpty ||
-          _resetPasswordController.text.isEmpty) {
-        throw Exception('Tous les champs doivent être remplis');
-      }
-      if (_passwordController.text != _resetPasswordController.text) {
-        throw Exception('Les mots de passe doivent correspondre');
-      }
-
-      if (_cinController.text.length != 8) {
-        throw Exception('Le numéro CIN doit contenir exactement 8 chiffres');
-      }
-
-      if (!isValidEmail(_emailController.text)) {
-        throw Exception('Veuillez entrer une adresse email valide');
-      }
-
-      // Effectuez la requête HTTP d'inscription
       var url = Uri.parse('http://127.0.0.1:8000/users/register/');
       var headers = {'Content-Type': 'application/json'};
       var body = json.encode({
         'firstName': _firstNameController.text,
         'lastName': _lastNameController.text,
-        'cin': int.parse(_cinController.text),
+        'cin': _cinController.text,
         'dateDeDelivrance': _dateDeDelivranceController.text,
         'email': _emailController.text,
         'phoneNumber': int.parse(_phoneNumberController.text),
-        'statut': _statutController.text,
+        'statut': _selectedRole,
         'password': _passwordController.text,
         'resetPassword': _resetPasswordController.text,
       });
 
       var response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 200) {
-        // Traitement en cas de succès
-        // Effacez les valeurs des champs après l'inscription
-        _firstNameController.clear();
-        _lastNameController.clear();
-        _cinController.clear();
-        _dateDeDelivranceController.clear();
-        _emailController.clear();
-        _phoneNumberController.clear();
-        _statutController.clear();
-        _passwordController.clear();
-        _resetPasswordController.clear();
-
+      if (response.statusCode == 201) {
         // Affichez un message de succès si l'inscription réussit
         _showSnackBar('Inscription réussie');
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => LoginPage(),
+          ));
+        });
       } else {
-        // Traitement en cas d'erreur
-        throw Exception('Erreur lors de l\'inscription: ${response.body}');
+        String errorMessage = response.body.isEmpty
+            ? 'Erreur inconnue lors de l\'inscription'
+            : response.body;
+        throw Exception(
+            'Erreur lors de l\'inscription: ${response.statusCode} - $errorMessage');
       }
 
-      // Notifie les écouteurs du changement d'état
       notifyListeners();
     } catch (e) {
-      // Affichez un SnackBar pour informer l'utilisateur de l'erreur
       _showSnackBar(e.toString());
     }
   }
@@ -125,32 +145,53 @@ class UserModel extends ChangeNotifier {
     super.dispose();
   }
 
-  String? validatePhoneNumber(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Veuillez entrer un numéro de téléphone';
-    }
-    final isDigitsOnly = value.contains(RegExp(r'^[0-9]+$'));
-    if (!isDigitsOnly) {
-      return 'Le numéro de téléphone ne doit contenir que des chiffres';
-    }
-    if (value.length != 8) {
-      return 'Le numéro de téléphone doit contenir exactement 8 chiffres';
-    }
-    return null;
+  String getFullName() {
+    return '$_firstName $_lastName';
   }
 
-  // Validation d'une adresse email
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email);
+  String getstatut() {
+    return '$statut';
   }
 
-  void showSnackBar(BuildContext context, String message) {
-    var scaffoldKey;
-    scaffoldKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+  UserModel getUserModel() {
+    // Implémentez cette méthode pour obtenir userModel
+    // Peut-être à partir d'un service ou d'un stockage local
+    return UserModel(
+        this._showSnackBar); // Exemple de création d'un nouvel objet UserModel
   }
+
+  void updatePhoto(String base64Image) {
+    _photoBase64 = base64Image;
+    notifyListeners();
+  }
+
+  getPhotoUrl() {}
+
+  // Future<void> sendEmail(BuildContext context) async {
+  //   final String email = emailController.text.trim();
+
+  //   // Make POST request to your backend API
+  //   final Uri url = Uri.parse('http://localhost:8000/users/send_Email/');
+  //   final http.Response response = await http.post(
+  //     url,
+  //     body: {'email': email},
+  //   );
+
+  //   // Handle response
+  //   if (response.statusCode == 200) {
+  //     // Password reset email sent successfully
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Password reset email sent successfully'),
+  //       ),
+  //     );
+  //   } else {
+  //     // Error sending password reset email
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Failed to send password reset email'),
+  //       ),
+  //     );
+  //   }
+  //}
 }

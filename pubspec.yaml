@@ -58,8 +58,7 @@ dependencies:
   url_launcher_android: ^6.0.27
   url_launcher_ios: ^6.1.4
   url_launcher_platform_interface: ^2.1.2
-  
-  
+  advance_pdf_viewer: ^2.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -81,8 +80,9 @@ dependencies:
   flutter_localization: ^0.2.0
   country_code_picker: ^3.0.0
   phone_form_field: ^9.1.0
+  image_picker: ^1.0.7
   
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -90,7 +90,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/logo.png"
+
   
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -104,12 +104,7 @@ flutter_icons:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-flutter:
-
-  assets:
-    - assets/logo.png
-   
-  
+flutter: 
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
