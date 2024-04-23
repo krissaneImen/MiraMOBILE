@@ -7,7 +7,6 @@ import 'package:mira/Screens/MenuScreens/ReglementExamensPage.dart';
 import 'package:mira/Screens/MenuScreens/ReglementsPage.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
 import 'package:mira/Screens/MenuScreens/formations.dart';
-import 'package:mira/Screens/Profil.dart';
 
 class EnseignantDrawer extends StatelessWidget {
   final UserModel userModel; // Ajoutez une instance de UserModel comme argument
@@ -32,28 +31,11 @@ class EnseignantDrawer extends StatelessWidget {
               'Menu Enseignant',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
                     fontFamily: 'Outfit',
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: const Color.fromARGB(255, 100, 100, 100),
                     fontSize: 24,
                     fontWeight: FontWeight.w500,
                   ),
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text(
-              'Profil',
-              style: TextStyle(
-                color: Color(0xFF15161E),
-                fontSize: 16,
-                fontFamily: 'Outfit',
-              ),
-            ),
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => Profile(
-                      // userModel: userModel,
-                      )));
-            },
           ),
           ExpansionTile(
             leading: Icon(Icons.new_releases),

@@ -26,8 +26,8 @@ class _AdministratifDrawerState extends State<AdministratifDrawer> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  FlutterFlowTheme.of(context).primary,
-                  FlutterFlowTheme.of(context).tertiary
+                  FlutterFlowTheme.of(context).primaryBackground,
+                  FlutterFlowTheme.of(context).primaryBackground
                 ],
               ),
             ),
@@ -35,7 +35,7 @@ class _AdministratifDrawerState extends State<AdministratifDrawer> {
               'Menu Enseignant',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
                     fontFamily: 'Outfit',
-                    color: Color.fromARGB(255, 255, 255, 255),
+                    color: const Color.fromARGB(255, 100, 100, 100),
                     fontSize: 24,
                     fontWeight: FontWeight.w500,
                   ),

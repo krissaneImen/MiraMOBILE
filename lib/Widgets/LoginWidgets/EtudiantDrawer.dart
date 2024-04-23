@@ -18,15 +18,15 @@ class _EtudiantDrawerState extends State<EtudiantDrawer> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  FlutterFlowTheme.of(context).primary,
-                  FlutterFlowTheme.of(context).tertiary
+                  FlutterFlowTheme.of(context).primaryBackground,
+                  FlutterFlowTheme.of(context).primaryBackground
                 ],
               ), // Fermez correctement la définition du gradient
             ),
             child: Text(
               'Menu Étudiant',
               style: TextStyle(
-                color: Colors.white,
+                color: const Color.fromARGB(255, 100, 100, 100),
                 fontSize: 24,
               ),
             ),

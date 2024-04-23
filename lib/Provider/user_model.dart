@@ -2,14 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:mira/Screens/acceuil.dart';
+import 'package:mira/Models/User.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
+import 'package:mira/Screens/acceuil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserModel extends ChangeNotifier {
   late String? _selectedRole;
   late String statut = '';
   late String _firstName = '';
   late String _lastName = '';
+  late String date_de_delivrance;
+  late String email = '';
+  late int cin;
+  late int phoneNumber;
   late bool passwordVisibility;
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -54,7 +60,7 @@ class UserModel extends ChangeNotifier {
   TextEditingController get resetPasswordController => _resetPasswordController;
   String? getPhotoBase64() => _photoBase64;
 //Connexion
-  Future<void> loginUser(BuildContext context) async {
+  Future<User> loginUser(BuildContext context) async {
     try {
       var url = Uri.parse('http://127.0.0.1:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
@@ -68,16 +74,21 @@ class UserModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
 
-        _firstName = userData['firstName'] ?? '';
-        _lastName = userData['lastName'] ?? '';
-        statut = userData['statut'] ?? '';
-        notifyListeners();
-        print('Prénom: $_firstName');
-        print('Nom: $_lastName');
-        print('Statut: $statut');
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => Accueil(userModel: this),
-        ));
+        // Créez un objet User avec les données récupérées
+        User user = User(
+          firstName: userData['firstName'] ?? '',
+          lastName: userData['lastName'] ?? '',
+          statut: userData['statut'] ?? '',
+          cin: userData['cin'] ?? '',
+          email: userData['email'] ?? '',
+          dateDeDelivrance: userData['dateDeDelivrance'] ?? '',
+          phoneNumber: userData['phoneNumber'],
+        );
+
+        await saveUserData(user);
+
+        // Retournez l'objet User pour pouvoir l'utiliser dans votre application
+        return user;
       } else {
         String errorMessage = response.body.isEmpty
             ? 'Erreur inconnue lors de la connexion'
@@ -90,44 +101,35 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  Future<void> registerUser(BuildContext context) async {
-    try {
-      var url = Uri.parse('http://127.0.0.1:8000/users/register/');
-      var headers = {'Content-Type': 'application/json'};
-      var body = json.encode({
-        'firstName': _firstNameController.text,
-        'lastName': _lastNameController.text,
-        'cin': _cinController.text,
-        'dateDeDelivrance': _dateDeDelivranceController.text,
-        'email': _emailController.text,
-        'phoneNumber': int.parse(_phoneNumberController.text),
-        'statut': _selectedRole,
-        'password': _passwordController.text,
-        'resetPassword': _resetPasswordController.text,
-      });
+  Future<void> saveUserData(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('userCin', user.cin);
+    prefs.setString('firstName', user.firstName);
+    prefs.setString('lastName', user.lastName);
+    prefs.setString('statut', user.statut);
+    prefs.setString('dateDeDelivrance', user.dateDeDelivrance as String);
+    prefs.setString('email', user.email);
+    prefs.setString('phoneNumber', user.phoneNumber as String);
+  }
 
-      var response = await http.post(url, headers: headers, body: body);
+  Future<User> getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userCin = prefs.getString('userCin') ?? '';
+    final firstName = prefs.getString('firstName') ?? '';
+    final lastName = prefs.getString('lastName') ?? '';
+    final statut = prefs.getString('statut') ?? '';
+    final dateDeDelivrance = prefs.getString('dateDeDelivrance') ?? '';
+    final email = prefs.getString('email') ?? '';
+    final phoneNumber = prefs.getString('phoneNumber') ?? '';
 
-      if (response.statusCode == 201) {
-        // Affichez un message de succès si l'inscription réussit
-        _showSnackBar('Inscription réussie');
-        Future.delayed(Duration(seconds: 1), () {
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => LoginPage(),
-          ));
-        });
-      } else {
-        String errorMessage = response.body.isEmpty
-            ? 'Erreur inconnue lors de l\'inscription'
-            : response.body;
-        throw Exception(
-            'Erreur lors de l\'inscription: ${response.statusCode} - $errorMessage');
-      }
-
-      notifyListeners();
-    } catch (e) {
-      _showSnackBar(e.toString());
-    }
+    return User(
+        cin: userCin,
+        firstName: firstName,
+        lastName: lastName,
+        statut: statut,
+        dateDeDelivrance: dateDeDelivrance,
+        email: email,
+        phoneNumber: phoneNumber);
   }
 
   @override
@@ -153,45 +155,72 @@ class UserModel extends ChangeNotifier {
     return '$statut';
   }
 
-  UserModel getUserModel() {
-    // Implémentez cette méthode pour obtenir userModel
-    // Peut-être à partir d'un service ou d'un stockage local
-    return UserModel(
-        this._showSnackBar); // Exemple de création d'un nouvel objet UserModel
+  Future<void> registerUser(BuildContext context) async {
+    try {
+      var userUrl = Uri.parse('http://127.0.0.1:8000/users/register/');
+      var profileUrl = Uri.parse('http://127.0.0.1:8000/profil/create/');
+
+      var headers = {'Content-Type': 'application/json'};
+      var userBody = json.encode({
+        'firstName': _firstNameController.text,
+        'lastName': _lastNameController.text,
+        'cin': _cinController.text,
+        'dateDeDelivrance': _dateDeDelivranceController.text,
+        'email': _emailController.text,
+        'phoneNumber': int.parse(_phoneNumberController.text),
+        'statut': _selectedRole,
+        'password': _passwordController.text,
+        'resetPassword': _resetPasswordController.text,
+      });
+
+      var userResponse =
+          await http.post(userUrl, headers: headers, body: userBody);
+
+      print('User Response Status Code: ${userResponse.statusCode}');
+      print('User Response Body: ${userResponse.body}');
+
+      if (userResponse.statusCode == 201) {
+        var profileBody = json.encode({
+          'cartCin': _cinController.text,
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
+          'dateDeDelivrance': _dateDeDelivranceController.text,
+          'email': _emailController.text,
+          'phoneNumber': _phoneNumberController.text,
+        });
+
+        var profileResponse =
+            await http.post(profileUrl, headers: headers, body: profileBody);
+
+        print('Profile Response Status Code: ${profileResponse.statusCode}');
+        print('Profile Response Body: ${profileResponse.body}');
+
+        if (profileResponse.statusCode == 201) {
+          _showSnackBar('Inscription réussie');
+          Future.delayed(Duration(seconds: 1), () {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ));
+          });
+        } else {
+          String errorMessage = profileResponse.body.isEmpty
+              ? 'Erreur inconnue lors de la création du profil'
+              : profileResponse.body;
+          throw Exception(
+              'Erreur lors de la création du profil: ${profileResponse.statusCode} - $errorMessage');
+        }
+      } else {
+        String errorMessage = userResponse.body.isEmpty
+            ? 'Erreur inconnue lors de l\'inscription'
+            : userResponse.body;
+        throw Exception(
+            'Erreur lors de l\'inscription: ${userResponse.statusCode} - $errorMessage');
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _showSnackBar('Erreur lors de l\'inscription: $e');
+      print('Error during registration: $e');
+    }
   }
-
-  void updatePhoto(String base64Image) {
-    _photoBase64 = base64Image;
-    notifyListeners();
-  }
-
-  getPhotoUrl() {}
-
-  // Future<void> sendEmail(BuildContext context) async {
-  //   final String email = emailController.text.trim();
-
-  //   // Make POST request to your backend API
-  //   final Uri url = Uri.parse('http://localhost:8000/users/send_Email/');
-  //   final http.Response response = await http.post(
-  //     url,
-  //     body: {'email': email},
-  //   );
-
-  //   // Handle response
-  //   if (response.statusCode == 200) {
-  //     // Password reset email sent successfully
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Password reset email sent successfully'),
-  //       ),
-  //     );
-  //   } else {
-  //     // Error sending password reset email
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Failed to send password reset email'),
-  //       ),
-  //     );
-  //   }
-  //}
 }

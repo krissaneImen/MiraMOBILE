@@ -228,7 +228,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                     height: 44,
                                     padding: EdgeInsets.zero,
                                     iconPadding: EdgeInsets.zero,
-                                    color: Color(0xFFFFBF1E),
+                                    color: Color(0xFF4B39EF),
                                     textStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .override(

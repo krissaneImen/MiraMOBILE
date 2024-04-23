@@ -320,7 +320,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                                       0, 0, 0, 0),
                                   iconPadding: EdgeInsetsDirectional.fromSTEB(
                                       0, 0, 0, 0),
-                                  color: Color(0xFFFFBF1E),
+                                  color: Color(0xFF4B39EF),
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(

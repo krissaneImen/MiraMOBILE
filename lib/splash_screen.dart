@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
-import 'package:google_fonts/google_fonts.dart'; // Importez la bibliothèque google_fonts
+import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -14,18 +14,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Démarrez l'animation de fondu
     Timer(Duration(milliseconds: 500), () {
       setState(() {
         _opacity = 1.0;
       });
     });
-    // Attendre 3 secondes puis naviguer vers la page principale
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (_) =>
-                LoginPage()), // Remplacez HomeScreen par la page principale de votre application
+        MaterialPageRoute(builder: (_) => LoginPage()),
       );
     });
   }
@@ -34,59 +30,63 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 1000),
-              opacity: _opacity,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Color.fromARGB(255, 241, 180, 25)),
-              ),
-            ),
-            SizedBox(
-                height:
-                    40), // Espacement entre le cercle de chargement et le titre
-            AnimatedOpacity(
-              duration: Duration(milliseconds: 1000),
-              opacity: _opacity,
-              child: Text(
-                'Iset Tataouine',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 121, 121, 121),
-                  fontFamily: 'Readex Pro',
-                ),
-              ),
-            ),
-            SizedBox(
-                height: 40), // Espacement entre le titre et la rangée d'icônes
-            Row(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Image de fond
+
+          Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Ajoutez des icônes ici si nécessaire
+                // Logo de l'application
+                Image.asset(
+                  'imen.png',
+                  width: 150,
+                  height: 150,
+                ),
+                SizedBox(height: 20),
+                // Barre de progression personnalisée
+                AnimatedOpacity(
+                  duration: Duration(milliseconds: 1000),
+                  opacity: _opacity,
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color(0xFF4B39EF),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Titre de l'application
+                AnimatedOpacity(
+                  duration: Duration(milliseconds: 1000),
+                  opacity: _opacity,
+                  child: Text(
+                    'Iset Tataouine',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 121, 121, 121),
+                      fontFamily: 'Readex Pro',
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Texte "By Mira"
+                Text(
+                  'By Mira',
+                  style: GoogleFonts.dancingScript(
+                    textStyle: TextStyle(
+                      fontSize: 24,
+                      color: Colors.black54,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
               ],
             ),
-            SizedBox(
-                height:
-                    250), // Espacement entre la rangée d'icônes et le texte "Par Mira"
-            Text(
-              'By Mira',
-              style: GoogleFonts.dancingScript(
-                // Utilisation de GoogleFonts.dancingScript
-                textStyle: TextStyle(
-                  fontSize: 35,
-                  color: Colors.black54,
-                  fontStyle: FontStyle
-                      .italic, // Ajout de la propriété fontStyle pour inclure l'italique
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
