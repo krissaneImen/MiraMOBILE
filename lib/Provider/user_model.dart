@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:mira/Models/User.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
 import 'package:mira/Screens/acceuil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class UserModel extends ChangeNotifier {
   late String? _selectedRole;
@@ -60,7 +58,7 @@ class UserModel extends ChangeNotifier {
   TextEditingController get resetPasswordController => _resetPasswordController;
   String? getPhotoBase64() => _photoBase64;
 //Connexion
-  Future<User> loginUser(BuildContext context) async {
+  Future<void> loginUser(BuildContext context) async {
     try {
       var url = Uri.parse('http://127.0.0.1:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
@@ -74,21 +72,39 @@ class UserModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
 
-        // Créez un objet User avec les données récupérées
-        User user = User(
-          firstName: userData['firstName'] ?? '',
-          lastName: userData['lastName'] ?? '',
-          statut: userData['statut'] ?? '',
-          cin: userData['cin'] ?? '',
-          email: userData['email'] ?? '',
-          dateDeDelivrance: userData['dateDeDelivrance'] ?? '',
-          phoneNumber: userData['phoneNumber'],
-        );
+        _firstName = userData['firstName'] ?? '';
+        _lastName = userData['lastName'] ?? '';
+        statut = userData['statut'] ?? '';
+        email = userData['email'] ?? '';
+        int? cin = userData['cin'] != null
+            ? int.parse(userData['cin'].toString())
+            : null;
+        int? phoneNumber = userData['phoneNumber'] != null
+            ? int.parse(userData['phoneNumber'].toString())
+            : null;
+        DateTime? date_de_delivrance;
+        String? dateString = userData['dateDeDelivrance'];
 
-        await saveUserData(user);
+        if (dateString != null) {
+          try {
+            date_de_delivrance = DateTime.parse(dateString);
+          } catch (e) {
+            // Gérer l'erreur de format de date ici
+            print('Erreur lors de l\'analyse de la date: $e');
+          }
+        }
 
-        // Retournez l'objet User pour pouvoir l'utiliser dans votre application
-        return user;
+        notifyListeners();
+        print('Prénom: $_firstName');
+        print('Nom: $_lastName');
+        print('Statut: $statut');
+        print('email: $email');
+        print('cin :$cin');
+        print('phoneNumber: $phoneNumber');
+        print('date de del: $date_de_delivrance');
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => Accueil(userModel: this),
+        ));
       } else {
         String errorMessage = response.body.isEmpty
             ? 'Erreur inconnue lors de la connexion'
@@ -99,37 +115,6 @@ class UserModel extends ChangeNotifier {
     } catch (e) {
       _showSnackBar(e.toString());
     }
-  }
-
-  Future<void> saveUserData(User user) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userCin', user.cin);
-    prefs.setString('firstName', user.firstName);
-    prefs.setString('lastName', user.lastName);
-    prefs.setString('statut', user.statut);
-    prefs.setString('dateDeDelivrance', user.dateDeDelivrance as String);
-    prefs.setString('email', user.email);
-    prefs.setString('phoneNumber', user.phoneNumber as String);
-  }
-
-  Future<User> getUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userCin = prefs.getString('userCin') ?? '';
-    final firstName = prefs.getString('firstName') ?? '';
-    final lastName = prefs.getString('lastName') ?? '';
-    final statut = prefs.getString('statut') ?? '';
-    final dateDeDelivrance = prefs.getString('dateDeDelivrance') ?? '';
-    final email = prefs.getString('email') ?? '';
-    final phoneNumber = prefs.getString('phoneNumber') ?? '';
-
-    return User(
-        cin: userCin,
-        firstName: firstName,
-        lastName: lastName,
-        statut: statut,
-        dateDeDelivrance: dateDeDelivrance,
-        email: email,
-        phoneNumber: phoneNumber);
   }
 
   @override
