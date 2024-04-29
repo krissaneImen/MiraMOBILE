@@ -41,10 +41,11 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 // Logo de l'application
                 Image.asset(
-                  'imen.png',
+                  'assets/imen.png',
                   width: 150,
                   height: 150,
                 ),
+
                 SizedBox(height: 20),
                 // Barre de progression personnalisée
                 AnimatedOpacity(

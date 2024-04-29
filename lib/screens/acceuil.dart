@@ -3,9 +3,9 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/MenuScreens/NouveautesPage.dart';
 import 'package:mira/Screens/Profil.dart';
-import 'package:mira/Widgets/LoginWidgets/AdministratifDrawer.dart';
-import 'package:mira/Widgets/LoginWidgets/EnseignantDrawer.dart';
-import 'package:mira/Widgets/LoginWidgets/EtudiantDrawer.dart';
+import 'package:mira/Widgets/HomeWidgets/AdministratifDrawer.dart';
+import 'package:mira/Widgets/HomeWidgets/EnseignantDrawer.dart';
+import 'package:mira/Widgets/HomeWidgets/EtudiantDrawer.dart';
 
 class Accueil extends StatefulWidget {
   final UserModel userModel;
@@ -123,9 +123,10 @@ class _AccueilState extends State<Accueil> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
+                      child: Image.asset(
                         'assets/act.jpeg',
-                        width: double.infinity,
+                        width: MediaQuery.of(context).size.width *
+                            0.9, // Ajustez la largeur de l'image en fonction de la largeur de l'écran
                         height: 200,
                         fit: BoxFit.cover,
                       ),
@@ -141,7 +142,7 @@ class _AccueilState extends State<Accueil> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Toutes l\'actualité',
+                          'Toutes les actualités',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -164,9 +165,9 @@ class _AccueilState extends State<Accueil> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
+                      child: Image.asset(
                         'assets/man.jpeg',
-                        width: double.infinity,
+                        width: MediaQuery.of(context).size.width * 0.9,
                         height: 200,
                         fit: BoxFit.cover,
                       ),
@@ -220,10 +221,6 @@ class _AccueilState extends State<Accueil> {
             icon: Icon(Icons.account_circle_outlined),
             label: 'Profil',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.keyboard_control_rounded),
-            label: 'Voir plus',
-          ),
         ],
       ),
     );
@@ -252,14 +249,15 @@ class _AccueilState extends State<Accueil> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  Profile()), // Remplacez ProfilePage par le nom de votre page de profil
+              builder: (context) => Profile(
+                    firstName: widget.userModel.firstName,
+                    lastName: widget.userModel.lastName,
+                    statut: widget.userModel.statut,
+                    cin: widget.userModel.cin,
+                  )),
         );
         break;
-      case 4:
-        // Naviguer vers la page "Voir plus"
-        // Ajoutez la logique de navigation appropriée ici
-        break;
+
       default:
         break;
     }

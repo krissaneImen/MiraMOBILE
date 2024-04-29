@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class CINDateDelivranceRow extends StatelessWidget {
+class NomPrenomRow extends StatelessWidget {
+  final String nom;
+  final String prenom;
+
+  const NomPrenomRow({
+    required this.nom,
+    required this.prenom,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -11,18 +19,10 @@ class CINDateDelivranceRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
-              keyboardType: TextInputType.number,
-              obscureText: false,
+              initialValue: nom,
               decoration: InputDecoration(
-                labelText: 'Numéro de carte d\'identité nationale',
+                labelText: 'Nom',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                      fontFamily: 'Plus Jakarta Sans',
-                      color: Color(0xFF57636C),
-                      fontSize: 14,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                    ),
-                hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
                       fontSize: 14,
@@ -43,22 +43,6 @@ class CINDateDelivranceRow extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFFFF5963),
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFFFF5963),
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.white,
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
@@ -74,18 +58,10 @@ class CINDateDelivranceRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
-              obscureText: false,
+              initialValue: prenom,
               decoration: InputDecoration(
-                labelText: 'Date de Délivrance',
+                labelText: 'Prénom',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                      fontFamily: 'Plus Jakarta Sans',
-                      color: Color(0xFF57636C),
-                      fontSize: 14,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                    ),
-                hintText: 'Date de Délivrance',
-                hintStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
                       fontSize: 14,
@@ -106,26 +82,11 @@ class CINDateDelivranceRow extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                errorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFFFF5963),
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color(0xFFFF5963),
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.white,
+                // Autres propriétés de décoration selon vos besoins
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
-                    color: Color(0xFFDBE2E7),
+                    color: Color(0xFF14181B),
                     fontSize: 14,
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,

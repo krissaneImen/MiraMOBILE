@@ -36,7 +36,7 @@ class _ReglementLoiCirculairePageState
   Future<List<dynamic>> fetchLoisCirculaires() async {
     final response = await http.get(
       Uri.parse(
-          'http://127.0.0.1:8000/documentation/reglement_loi_circulaire/'),
+          'http://172.16.25.125:8000/documentation/reglement_loi_circulaire/'),
     );
 
     if (response.statusCode == 200) {

@@ -8,11 +8,11 @@ import 'package:mira/Screens/acceuil.dart';
 class UserModel extends ChangeNotifier {
   late String? _selectedRole;
   late String statut = '';
-  late String _firstName = '';
-  late String _lastName = '';
+  late String firstName = '';
+  late String lastName = '';
   late String date_de_delivrance;
   late String email = '';
-  late int cin;
+  late String cin = '';
   late int phoneNumber;
   late bool passwordVisibility;
   late TextEditingController _firstNameController;
@@ -21,8 +21,7 @@ class UserModel extends ChangeNotifier {
   late TextEditingController _dateDeDelivranceController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
-  late TextEditingController
-      _statutController; // Ajout du contrôleur pour le champ "statut"
+  late TextEditingController _statutController;
   late TextEditingController _passwordController;
   late TextEditingController _resetPasswordController;
   late Function(String) _showSnackBar;
@@ -36,8 +35,7 @@ class UserModel extends ChangeNotifier {
     _dateDeDelivranceController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
-    _statutController =
-        TextEditingController(); // Initialisation du contrôleur pour le champ "statut"
+    _statutController = TextEditingController();
     _passwordController = TextEditingController();
     _resetPasswordController = TextEditingController();
   }
@@ -60,7 +58,7 @@ class UserModel extends ChangeNotifier {
 //Connexion
   Future<void> loginUser(BuildContext context) async {
     try {
-      var url = Uri.parse('http://127.0.0.1:8000/users/login/');
+      var url = Uri.parse('http://192.168.1.21:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
       var body = json.encode({
         'cin': _cinController.text,
@@ -72,13 +70,11 @@ class UserModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
 
-        _firstName = userData['firstName'] ?? '';
-        _lastName = userData['lastName'] ?? '';
+        firstName = userData['firstName'] ?? '';
+        lastName = userData['lastName'] ?? '';
         statut = userData['statut'] ?? '';
         email = userData['email'] ?? '';
-        int? cin = userData['cin'] != null
-            ? int.parse(userData['cin'].toString())
-            : null;
+        cin = userData['cin'] ?? '';
         int? phoneNumber = userData['phoneNumber'] != null
             ? int.parse(userData['phoneNumber'].toString())
             : null;
@@ -95,13 +91,7 @@ class UserModel extends ChangeNotifier {
         }
 
         notifyListeners();
-        print('Prénom: $_firstName');
-        print('Nom: $_lastName');
-        print('Statut: $statut');
-        print('email: $email');
-        print('cin :$cin');
-        print('phoneNumber: $phoneNumber');
-        print('date de del: $date_de_delivrance');
+
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => Accueil(userModel: this),
         ));
@@ -132,18 +122,10 @@ class UserModel extends ChangeNotifier {
     super.dispose();
   }
 
-  String getFullName() {
-    return '$_firstName $_lastName';
-  }
-
-  String getstatut() {
-    return '$statut';
-  }
-
   Future<void> registerUser(BuildContext context) async {
     try {
-      var userUrl = Uri.parse('http://127.0.0.1:8000/users/register/');
-      var profileUrl = Uri.parse('http://127.0.0.1:8000/profil/create/');
+      var userUrl = Uri.parse('http://192.168.1.21:8000/users/register/');
+      var profileUrl = Uri.parse('http://192.168.1.21:8000/profil/create/');
 
       var headers = {'Content-Type': 'application/json'};
       var userBody = json.encode({
@@ -181,7 +163,8 @@ class UserModel extends ChangeNotifier {
         print('Profile Response Body: ${profileResponse.body}');
 
         if (profileResponse.statusCode == 201) {
-          _showSnackBar('Inscription réussie');
+          _showSnackBar(
+              'Inscription réussie ! Veuillez patienter pendant que nous activons votre compte.');
           Future.delayed(Duration(seconds: 1), () {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) => LoginPage(),

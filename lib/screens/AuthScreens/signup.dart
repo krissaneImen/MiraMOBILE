@@ -103,7 +103,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                     ),
                     alignment: AlignmentDirectional(0, 0),
                     child: Image.asset(
-                      'isetlogo.png',
+                      'assets/isetlogo.png',
                       fit: BoxFit.contain,
                     ),
                   ),

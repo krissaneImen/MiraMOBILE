@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class AdresseMaotamediaRow extends StatelessWidget {
+class NomPrenomArabeRow extends StatelessWidget {
+  final String? nomArabe;
+  final String? prenomArabe;
+
+  const NomPrenomArabeRow({
+    Key? key,
+    this.nomArabe,
+    this.prenomArabe,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -13,9 +22,10 @@ class AdresseMaotamediaRow extends StatelessWidget {
             child: TextFormField(
               textAlign: TextAlign.right,
               obscureText: false,
+              initialValue: nomArabe ?? '',
               decoration: InputDecoration(
-                labelText: 'العنوان',
-                hintText: 'العنوان',
+                labelText: 'الإسم الأول',
+                hintText: 'الإسم الأول',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
@@ -63,7 +73,7 @@ class AdresseMaotamediaRow extends StatelessWidget {
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
-                    color: Color(0xFFDBE2E7),
+                    color: Color(0xFF14181B),
                     fontSize: 14,
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,
@@ -77,9 +87,11 @@ class AdresseMaotamediaRow extends StatelessWidget {
             child: TextFormField(
               textAlign: TextAlign.right,
               obscureText: false,
+              initialValue: prenomArabe ??
+                  '', // Utilisez une chaîne vide si prenomArabe est nul
               decoration: InputDecoration(
-                labelText: 'المعتمدية',
-                hintText: 'المعتمدية',
+                labelText: 'اللقب',
+                hintText: 'اللقب',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
@@ -127,7 +139,7 @@ class AdresseMaotamediaRow extends StatelessWidget {
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
-                    color: Color(0xFFDBE2E7),
+                    color: Color(0xFF14181B),
                     fontSize: 14,
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,

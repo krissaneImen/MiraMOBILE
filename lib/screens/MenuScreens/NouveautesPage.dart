@@ -33,7 +33,7 @@ class _NouveautesPageState extends State<NouveautesPage> {
 
   Future<List<dynamic>> fetchNouveautes() async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/nouv/list/'),
+      Uri.parse('http://172.16.25.125:8000/nouv/list/'),
     );
 
     if (response.statusCode == 200) {
@@ -65,7 +65,7 @@ class _NouveautesPageState extends State<NouveautesPage> {
           },
         ),
         title: Text(
-          'Nouveautés',
+          'Actualités',
           style: FlutterFlowTheme.of(context).titleLarge,
         ),
         centerTitle: false,

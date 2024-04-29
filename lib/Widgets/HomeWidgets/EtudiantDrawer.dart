@@ -24,7 +24,7 @@ class _EtudiantDrawerState extends State<EtudiantDrawer> {
               ), // Fermez correctement la définition du gradient
             ),
             child: Text(
-              'Menu Étudiant',
+              'Tableau de Bord Étudiant',
               style: TextStyle(
                 color: const Color.fromARGB(255, 100, 100, 100),
                 fontSize: 24,
@@ -32,7 +32,7 @@ class _EtudiantDrawerState extends State<EtudiantDrawer> {
             ),
           ),
           ListTile(
-            title: Text('Item Étudiant 1'),
+            title: Text('Calendrier Universitaires'),
             onTap: () {
               // Mettez ici le code que vous souhaitez exécuter lorsque l'élément 1 est sélectionné dans le menu latéral de l'étudiant
             },

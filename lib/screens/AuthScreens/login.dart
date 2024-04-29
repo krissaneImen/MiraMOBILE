@@ -84,7 +84,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                         alignment: AlignmentDirectional(0, 0),
                         child: Image.asset(
-                          'isetlogo.png',
+                          'assets/isetlogo.png',
                           fit: BoxFit.contain,
                         ),
                       ),

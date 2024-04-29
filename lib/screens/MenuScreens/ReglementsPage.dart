@@ -11,8 +11,8 @@ class ReglementsPage extends StatefulWidget {
 
 class _ReglementsPageState extends State<ReglementsPage> {
   Future<List<dynamic>> fetchReglements() async {
-    final response = await http.get(
-        Uri.parse('http://127.0.0.1:8000/documentation/reglement_interieur/'));
+    final response = await http.get(Uri.parse(
+        'http://172.16.25.125:8000/documentation/reglement_interieur/'));
 
     if (response.statusCode == 200) {
       // Si la requête réussit, décoder les données JSON

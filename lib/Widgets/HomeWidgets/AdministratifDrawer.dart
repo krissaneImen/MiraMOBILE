@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/NouveautesPage.dart';
-import 'package:mira/Screens/MenuScreens/ReglementLoiCirculairePage.dart';
-import 'package:mira/Screens/MenuScreens/ReglementExamensPage.dart';
-import 'package:mira/Screens/MenuScreens/ReglementsPage.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
-import 'package:mira/Screens/MenuScreens/formations.dart';
+import 'package:mira/Screens/MenuScreens/NouveautesPage.dart';
+import 'package:mira/Screens/MenuScreens/ReglementExamensPage.dart';
+import 'package:mira/Screens/MenuScreens/ReglementLoiCirculairePage.dart';
+import 'package:mira/Screens/MenuScreens/ReglementsPage.dart';
 
-class EnseignantDrawer extends StatelessWidget {
+class AdministratifDrawer extends StatefulWidget {
   final UserModel userModel; // Ajoutez une instance de UserModel comme argument
 
-  EnseignantDrawer({required this.userModel});
+  AdministratifDrawer({required this.userModel});
+  @override
+  _AdministratifDrawerState createState() => _AdministratifDrawerState();
+}
+
+class _AdministratifDrawerState extends State<AdministratifDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -28,7 +32,7 @@ class EnseignantDrawer extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Menu Enseignant',
+              'Tableau de Bord Administratif',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
                     fontFamily: 'Outfit',
                     color: const Color.fromARGB(255, 100, 100, 100),
@@ -36,6 +40,22 @@ class EnseignantDrawer extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
             ),
+          ),
+          ListTile(
+            leading: Icon(Icons.person),
+            title: Text(
+              'Profil',
+              style: TextStyle(
+                color: Color(0xFF15161E),
+                fontSize: 16,
+                fontFamily: 'Outfit',
+              ),
+            ),
+            onTap: () {
+              // Navigator.of(context).pushReplacement(MaterialPageRoute(
+              //   builder: (context) => UserProfilePage(),
+              //));
+            },
           ),
           ExpansionTile(
             leading: Icon(Icons.new_releases),
@@ -58,7 +78,7 @@ class EnseignantDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => NouveautesPage(
-                            userModel: userModel,
+                            userModel: widget.userModel,
                           )));
                 },
               ),
@@ -70,8 +90,7 @@ class EnseignantDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => FormationList()));
+                  // Mettez ici le code que vous souhaitez exécuter
                 },
               ),
               ListTile(
@@ -88,140 +107,6 @@ class EnseignantDrawer extends StatelessWidget {
               ListTile(
                 title: Text(
                   'Calendriers des Examens',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-            ],
-          ),
-          ExpansionTile(
-            leading: Icon(Icons.business),
-            title: Text(
-              'Services Enseignants',
-              style: TextStyle(
-                color: Color(0xFF15161E),
-                fontSize: 16,
-                fontFamily: 'Outfit',
-              ),
-            ),
-            children: [
-              ListTile(
-                title: Text(
-                  'Photocopies',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Emplois du Temps',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Calendrier des surveillances',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Attectation de travail',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Avis d absence',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Avis de Test',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Absences collectives',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Autorisations de formation',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Conseils scientifiques',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Réunions des directeurs',
-                  style: TextStyle(
-                    color: Color(0xFF15161E),
-                  ),
-                ),
-                onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter
-                },
-              ),
-              ListTile(
-                title: Text(
-                  'Réservations de ressources',
                   style: TextStyle(
                     color: Color(0xFF15161E),
                   ),
@@ -275,7 +160,7 @@ class EnseignantDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => ReglementExamensPage(
-                            userModel: userModel,
+                            userModel: widget.userModel,
                           )));
                 },
               ),
@@ -298,13 +183,10 @@ class EnseignantDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => ReglementLoiCirculairePage(
-                        userModel: userModel,
-                      ),
-                    ),
-                  );
+                            userModel: widget.userModel,
+                          )));
                 },
               ),
               ListTile(

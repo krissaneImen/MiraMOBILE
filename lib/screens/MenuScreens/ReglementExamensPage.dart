@@ -24,7 +24,7 @@ class _ReglementExamensPageState extends State<ReglementExamensPage> {
 
   Future<List<dynamic>> fetchExamens() async {
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/documentation/reglement_examens/'),
+      Uri.parse('http://172.16.25.125:8000/documentation/reglement_examens/'),
     );
 
     if (response.statusCode == 200) {
