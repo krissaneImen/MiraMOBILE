@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class NomPrenomRow extends StatelessWidget {
+class NomPrenomRow extends StatefulWidget {
   final String nom;
   final String prenom;
+  final Function(String) onNomChanged;
+  final Function(String) onPrenomChanged;
 
   const NomPrenomRow({
     required this.nom,
     required this.prenom,
+    required this.onNomChanged,
+    required this.onPrenomChanged,
   });
+
+  @override
+  _NomPrenomRowState createState() => _NomPrenomRowState();
+}
+
+class _NomPrenomRowState extends State<NomPrenomRow> {
+  late TextEditingController _nomController;
+  late TextEditingController _prenomController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nomController = TextEditingController(text: widget.nom);
+    _prenomController = TextEditingController(text: widget.prenom);
+  }
+
+  @override
+  void dispose() {
+    _nomController.dispose();
+    _prenomController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +45,8 @@ class NomPrenomRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
-              initialValue: nom,
+              controller: _nomController,
+              onChanged: widget.onNomChanged,
               decoration: InputDecoration(
                 labelText: 'Nom',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
@@ -58,7 +85,8 @@ class NomPrenomRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
-              initialValue: prenom,
+              controller: _prenomController,
+              onChanged: widget.onPrenomChanged,
               decoration: InputDecoration(
                 labelText: 'Prénom',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
@@ -82,7 +110,6 @@ class NomPrenomRow extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                // Autres propriétés de décoration selon vos besoins
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',

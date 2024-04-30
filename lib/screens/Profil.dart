@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Screens/EditProfile.dart';
-import 'package:mira/Screens/PageAPropos.dart';
+import 'package:mira/AboutUs.dart';
 import 'package:mira/TermsOfServicePage.dart';
 
 class Profile extends StatefulWidget {
@@ -38,7 +38,7 @@ class _ProfileWidgetState extends State<Profile> {
 
   Future<void> _getProfileImage() async {
     String apiUrl =
-        'http://192.168.1.21:8000/profil/profiles/cin/${widget.cin}';
+        'http://172.16.26.185:8000/profil/profiles/cin/${widget.cin}';
 
     try {
       var response = await http.get(Uri.parse(apiUrl));

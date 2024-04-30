@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class DateLieuNaissanceRow extends StatefulWidget {
-  @override
-  _DateLieuNaissanceRowState createState() => _DateLieuNaissanceRowState();
-}
+class DateLieuNaissanceRow extends StatelessWidget {
+  final DateTime selectedDate;
+  final ValueChanged<DateTime> onDateChanged;
+  final String lieuNaissance;
+  final ValueChanged<String> onLieuNaissanceChanged;
 
-class _DateLieuNaissanceRowState extends State<DateLieuNaissanceRow> {
-  late DateTime _selectedDate;
-  TextEditingController _lieuNaissanceController = TextEditingController();
-  late String lieuNaissance = '';
-  @override
-  void initState() {
-    super.initState();
-    // Initialiser la date sélectionnée à la date actuelle
-    _selectedDate = DateTime.now();
-  }
+  const DateLieuNaissanceRow({
+    required this.selectedDate,
+    required this.onDateChanged,
+    required this.lieuNaissance,
+    required this.onLieuNaissanceChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,24 +57,19 @@ class _DateLieuNaissanceRowState extends State<DateLieuNaissanceRow> {
                     fontWeight: FontWeight.normal,
                   ),
               onTap: () async {
-                // Afficher le dialogue de sélection de date
                 final pickedDate = await showDatePicker(
                   context: context,
-                  initialDate: _selectedDate,
+                  initialDate: selectedDate,
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
-
-                // Mettre à jour la date sélectionnée si l'utilisateur a choisi une date
-                if (pickedDate != null && pickedDate != _selectedDate) {
-                  setState(() {
-                    _selectedDate = pickedDate;
-                  });
+                if (pickedDate != null) {
+                  onDateChanged(pickedDate);
                 }
               },
               // Afficher la date sélectionnée dans le champ
               controller: TextEditingController(
-                text: DateFormat('dd/MM/yyyy').format(_selectedDate),
+                text: DateFormat('dd/MM/yyyy').format(selectedDate),
               ),
             ),
           ),
@@ -86,12 +78,8 @@ class _DateLieuNaissanceRowState extends State<DateLieuNaissanceRow> {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
-              onChanged: (value) {
-                setState(() {
-                  lieuNaissance = value;
-                });
-              },
-              controller: _lieuNaissanceController,
+              onChanged: onLieuNaissanceChanged,
+              initialValue: lieuNaissance,
               decoration: InputDecoration(
                 labelText: 'Lieu de naissance',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
@@ -123,7 +111,6 @@ class _DateLieuNaissanceRowState extends State<DateLieuNaissanceRow> {
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,
                   ),
-              // initialValue: lieuNaissance.isNotEmpty ? lieuNaissance : null,
             ),
           ),
         ),

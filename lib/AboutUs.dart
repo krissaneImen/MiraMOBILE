@@ -537,6 +537,7 @@ class _SupportpageWidgetState extends State<propospageWidget>
   _launchPhone() async {
     const phone = '+21692349973';
     if (await canLaunch('tel:$phone')) {
+      // Ajout de 'tel:' avant le numéro de téléphone
       await launch('tel:$phone');
     } else {
       throw 'Impossible d\'ouvrir l\'application d\'appel.';

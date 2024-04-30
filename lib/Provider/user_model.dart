@@ -58,7 +58,7 @@ class UserModel extends ChangeNotifier {
 //Connexion
   Future<void> loginUser(BuildContext context) async {
     try {
-      var url = Uri.parse('http://192.168.1.21:8000/users/login/');
+      var url = Uri.parse('http://172.16.26.185:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
       var body = json.encode({
         'cin': _cinController.text,
@@ -124,8 +124,8 @@ class UserModel extends ChangeNotifier {
 
   Future<void> registerUser(BuildContext context) async {
     try {
-      var userUrl = Uri.parse('http://192.168.1.21:8000/users/register/');
-      var profileUrl = Uri.parse('http://192.168.1.21:8000/profil/create/');
+      var userUrl = Uri.parse('http://172.16.26.185:8000/users/register/');
+      var profileUrl = Uri.parse('http://172.16.26.185:8000/profil/create/');
 
       var headers = {'Content-Type': 'application/json'};
       var userBody = json.encode({

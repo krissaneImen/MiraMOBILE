@@ -33,7 +33,7 @@ class _NouveautesPageState extends State<NouveautesPage> {
 
   Future<List<dynamic>> fetchNouveautes() async {
     final response = await http.get(
-      Uri.parse('http://172.16.25.125:8000/nouv/list/'),
+      Uri.parse('http://172.16.26.185:8000/nouv/list/'),
     );
 
     if (response.statusCode == 200) {

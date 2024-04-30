@@ -31,33 +31,33 @@ class _EditprofilWidgetState extends State<Editprofil> {
   late String gouvernerat = '';
   late String genre = '';
   late String etatCivil = '';
-  late DateTime dateNaissance;
-  late String lieuNaissanceArabe = 'Chargement .....';
-  late String adresseArabe = 'Chargement ......';
-  late String delegationArabe = 'Chargement .....';
-  late String nomArabe = 'Chargement ....';
-  late String prenom_arabe = 'Chargement .....';
-  late String _profileImageUrl;
-  late String _email = 'Chargement ....';
-  late String PhoneNumber;
+  late DateTime dateNaissance = DateTime.now();
+  late String lieuNaissanceArabe = '';
+  late String adresseArabe = '';
+  late String delegationArabe = '';
+  late String nomArabe = '';
+  late String prenom_arabe = '';
+  late String _profileImageUrl = '';
+  late String _email = '';
+  late String PhoneNumber = '';
   late String nationalite = '';
   late String nom = '';
   late String prenom = '';
-  late DateTime _dateDelivrance;
+  late DateTime _dateDelivrance = DateTime.now();
   late ProfileModel model;
   bool _isLoading = true;
   String base64Image = '';
-  late DateTime _selectedDate;
-  late String formattedDate = '';
+  late DateTime _selectedDate = DateTime.now();
+  String formattedDate = '';
   String delegation = '';
   String lieuDeNaissanceArabe = '';
   late String lieuNaissance = '';
   late String adresse = '';
+
   @override
   void initState() {
     super.initState();
     model = ProfileModel();
-    _profileImageUrl = '';
     _fetchProfileData();
     _selectedDate = DateTime.now();
     // Convertir la date de délivrance en format ISO 8601
@@ -84,6 +84,11 @@ class _EditprofilWidgetState extends State<Editprofil> {
     }
   }
 
+  bool isValidBase64(String str) {
+    final RegExp base64Regex = RegExp(r'^[A-Za-z0-9+/]+[=]{0,2}$');
+    return base64Regex.hasMatch(str);
+  }
+
   Future<File?> compressImage(File imageFile) async {
     try {
       int quality = 85;
@@ -106,35 +111,9 @@ class _EditprofilWidgetState extends State<Editprofil> {
     }
   }
 
-  Future<void> _getImageFromGallery() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (image != null) {
-        File imageFile = File(image.path);
-        compressImage(imageFile).then((compressedImage) {
-          if (compressedImage != null) {
-            base64Image = base64String(compressedImage);
-            // Vérification si la chaîne base64Image est vide ou non
-            if (base64Image.isEmpty) {
-              print('La chaîne base64Image est vide.');
-            } else {
-              print('La chaîne base64Image n\'est pas vide : $base64Image');
-            }
-            setState(() {
-              _profileImageUrl = image.path; // Met à jour l'image du profil
-            });
-          } else {
-            print('Erreur lors de la compression de l\'image');
-          }
-        });
-      }
-    });
-  }
-
   Future<void> _fetchProfileData() async {
     String apiUrl =
-        'http://192.168.1.21:8000/profil/profiles/cin/${widget.cin}';
+        'http://172.16.26.185:8000/profil/profiles/cin/${widget.cin}';
 
     try {
       var response = await http.get(Uri.parse(apiUrl));
@@ -143,48 +122,31 @@ class _EditprofilWidgetState extends State<Editprofil> {
         var profileData = json.decode(response.body);
 
         setState(() {
-          String email = profileData['email'];
-          _email = email;
-          String phoneNumber = profileData['phoneNumber'];
-          PhoneNumber = phoneNumber;
-          String nomfr = profileData['firstName'];
-          nom = nomfr;
-          String prenomArabe = profileData['prenom_arabe'] ?? '';
-          prenom_arabe = prenomArabe;
-          String nomArabbe = profileData['nomArabe'] ?? '';
-          nomArabe = nomArabbe;
-          String prenomfr = profileData['lastName'];
-          prenom = prenomfr;
-          String lieuNaissanceArabee = profileData['lieuNaissanceArabe'] ?? '';
-          lieuNaissanceArabe = lieuNaissanceArabee;
-          String adresseArabee = profileData['adresseArabe'] ?? '';
-          adresseArabe = adresseArabee;
-          String delegationArabee = profileData['delegationArabe'] ?? '';
-          delegationArabe = delegationArabee;
-          String genres = profileData['delegationArabe'] ?? '';
-          genre = genres;
-          String dateDelivrance = profileData['dateDeDelivrance'];
-          _dateDelivrance = DateTime.parse(dateDelivrance);
-          String base64Image = profileData['image'];
-          Image image = imageFromBase64String(base64Image);
-          String Gouvernerat = profileData['gouvernerat'] ?? '';
-          gouvernerat = Gouvernerat;
-          String LieuNaissance = profileData['lieuNaissance'] ?? '';
-          lieuNaissance = LieuNaissance;
-          String etatCivile = profileData['etatCivil'] ?? '';
-          etatCivil = etatCivile;
-          String nationalites = profileData['nationalite'] ?? '';
-          nationalite = nationalites;
-          String dateNaissances = profileData['dateNaissance'];
-          dateNaissance = DateTime.parse(dateNaissances);
-          String lieuNais = profileData['lieuNaissance'] ?? '';
-          lieuNaissance = lieuNais;
-          String Adrs = profileData['adresse'] ?? '';
-          adresse = Adrs;
-          String delegations = profileData['delegation'] ?? '';
-          delegation = delegations;
-          String codePostals = profileData['codePostal'] ?? '';
-          codePostal = codePostals;
+          _email = profileData['email'] ?? '';
+          PhoneNumber = profileData['phoneNumber'] ?? '';
+          nom = profileData['firstName'] ?? '';
+          prenom_arabe = profileData['prenom_arabe'] ?? '';
+          nomArabe = profileData['nomArabe'] ?? '';
+          prenom = profileData['lastName'] ?? '';
+          lieuNaissanceArabe = profileData['lieuNaissanceArabe'] ?? '';
+          adresseArabe = profileData['adresseArabe'] ?? '';
+          delegationArabe = profileData['delegationArabe'] ?? '';
+          genre = profileData['genre'] ?? '';
+          _dateDelivrance = DateTime.parse(profileData['dateDeDelivrance']);
+          _profileImageUrl = profileData['image'] ?? '';
+          gouvernerat = profileData['gouvernerat'] ?? '';
+          lieuNaissance = profileData['lieuNaissance'] ?? '';
+          etatCivil = profileData['etatCivil'] ?? '';
+          nationalite = profileData['nationalite'] ?? '';
+
+          String dateNaissanceString = profileData['dateNaissance'] ?? '';
+          dateNaissance = dateNaissanceString.isNotEmpty
+              ? DateTime.parse(dateNaissanceString)
+              : DateTime
+                  .now(); // Vérification si la date n'est pas vide avant de la parser
+
+          adresse = profileData['adresse'] ?? '';
+          codePostal = profileData['codePostal'] ?? '';
           _isLoading = false;
         });
       } else {
@@ -215,9 +177,10 @@ class _EditprofilWidgetState extends State<Editprofil> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(50),
-                            child: _profileImageUrl.isNotEmpty
-                                ? Image.file(
-                                    File(_profileImageUrl),
+                            child: _profileImageUrl.isNotEmpty &&
+                                    isValidBase64(_profileImageUrl)
+                                ? Image.memory(
+                                    base64Decode(_profileImageUrl),
                                     width: 90,
                                     height: 90,
                                     fit: BoxFit.cover,
@@ -251,9 +214,20 @@ class _EditprofilWidgetState extends State<Editprofil> {
                         dateDelivrance: _dateDelivrance,
                       ),
                       NomPrenomRow(
-                        nom: nom ?? '',
-                        prenom: prenom ?? '',
+                        nom: nom,
+                        prenom: prenom,
+                        onNomChanged: (value) {
+                          setState(() {
+                            nom = value;
+                          });
+                        },
+                        onPrenomChanged: (value) {
+                          setState(() {
+                            prenom = value;
+                          });
+                        },
                       ),
+
                       Container(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
                         child: TextFormField(
@@ -266,15 +240,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                           },
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            labelStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Plus Jakarta Sans',
-                                  color: Color(0xFF57636C),
-                                  fontSize: 14,
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.normal,
-                                ),
+                            labelStyle: TextStyle(
+                              fontFamily: 'Plus Jakarta Sans',
+                              color: Color(0xFF57636C),
+                              fontSize: 14,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.normal,
+                            ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color(0xFFE0E3E7),
@@ -292,14 +264,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                             filled: true,
                             fillColor: Colors.white,
                           ),
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF14181B),
-                                    fontSize: 14,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.normal,
-                                  ),
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            color: Color(0xFF14181B),
+                            fontSize: 14,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
                       Container(
@@ -314,15 +285,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                           },
                           decoration: InputDecoration(
                             labelText: 'Numéro de Téléphone',
-                            labelStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Plus Jakarta Sans',
-                                  color: Color(0xFF57636C),
-                                  fontSize: 14,
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.normal,
-                                ),
+                            labelStyle: TextStyle(
+                              fontFamily: 'Plus Jakarta Sans',
+                              color: Color(0xFF57636C),
+                              fontSize: 14,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.normal,
+                            ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color(0xFFE0E3E7),
@@ -340,17 +309,30 @@ class _EditprofilWidgetState extends State<Editprofil> {
                             filled: true,
                             fillColor: Colors.white,
                           ),
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF14181B),
-                                    fontSize: 14,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.normal,
-                                  ),
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            color: Color(0xFF14181B),
+                            fontSize: 14,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
-                      DateLieuNaissanceRow(),
+                      DateLieuNaissanceRow(
+                        selectedDate: _selectedDate,
+                        onDateChanged: (newDate) {
+                          setState(() {
+                            _selectedDate = newDate;
+                          });
+                        },
+                        lieuNaissance: lieuNaissance,
+                        onLieuNaissanceChanged: (newLieuNaissance) {
+                          setState(() {
+                            lieuNaissance = newLieuNaissance;
+                          });
+                        },
+                      ),
+
                       AdresseCodePostalRow(),
                       GenreEtatCivilRow(),
                       Row(
@@ -363,15 +345,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                               child: TextFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Nationalité',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF57636C),
+                                    fontSize: 14,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -387,15 +367,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Color(0xFF14181B),
-                                      fontSize: 14,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  color: Color(0xFF14181B),
+                                  fontSize: 14,
+                                  letterSpacing: 0,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
@@ -417,15 +395,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                 },
                                 decoration: InputDecoration(
                                   labelText: 'Gouvernerat',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF57636C),
+                                    fontSize: 14,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -441,15 +417,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Color(0xFF14181B),
-                                      fontSize: 14,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  color: Color(0xFF14181B),
+                                  fontSize: 14,
+                                  letterSpacing: 0,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
@@ -471,15 +445,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                 },
                                 decoration: InputDecoration(
                                   labelText: 'Délégation',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF57636C),
+                                    fontSize: 14,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -495,15 +467,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Color(0xFF14181B),
-                                      fontSize: 14,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  color: Color(0xFF14181B),
+                                  fontSize: 14,
+                                  letterSpacing: 0,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
@@ -527,24 +497,20 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                 decoration: InputDecoration(
                                   labelText: 'مكان الولادة',
                                   hintText: 'مكان الولادة',
-                                  labelStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                  hintStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .override(
-                                        fontFamily: 'Plus Jakarta Sans',
-                                        color: Color(0xFF57636C),
-                                        fontSize: 14,
-                                        letterSpacing: 0,
-                                        fontWeight: FontWeight.normal,
-                                      ),
+                                  labelStyle: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF57636C),
+                                    fontSize: 14,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  hintStyle: TextStyle(
+                                    fontFamily: 'Plus Jakarta Sans',
+                                    color: Color(0xFF57636C),
+                                    fontSize: 14,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Color(0xFFE0E3E7),
@@ -576,15 +542,13 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                   filled: true,
                                   fillColor: Colors.white,
                                 ),
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: Color(0xFF14181B),
-                                      fontSize: 14,
-                                      letterSpacing: 0,
-                                      fontWeight: FontWeight.normal,
-                                    ),
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  color: Color(0xFF14181B),
+                                  fontSize: 14,
+                                  letterSpacing: 0,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                             ),
                           ),
@@ -639,5 +603,30 @@ class _EditprofilWidgetState extends State<Editprofil> {
               ),
       ),
     );
+  }
+
+  Future<void> _getImageFromGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (image != null) {
+        File imageFile = File(image.path);
+        compressImage(imageFile).then((compressedImage) {
+          if (compressedImage != null) {
+            base64Image = base64String(compressedImage);
+            if (base64Image.isEmpty || !isValidBase64(base64Image)) {
+              print('La chaîne base64Image est vide ou invalide.');
+            } else {
+              print('La chaîne base64Image est valide : $base64Image');
+              setState(() {
+                _profileImageUrl = base64Image;
+              });
+            }
+          } else {
+            print('Erreur lors de la compression de l\'image');
+          }
+        });
+      }
+    });
   }
 }
