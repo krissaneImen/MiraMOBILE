@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
 class AdresseCodePostalRow extends StatelessWidget {
+  final String adresse;
+  final ValueChanged<String> onadresseChanged;
+  final String codePostal;
+  final ValueChanged<String> oncodePostalChanged;
+
+  const AdresseCodePostalRow(
+      {super.key,
+      required this.adresse,
+      required this.onadresseChanged,
+      required this.codePostal,
+      required this.oncodePostalChanged});
   @override
   Widget build(BuildContext context) {
-    TextEditingController _adresseController = TextEditingController(text: '');
-    TextEditingController _codePostalController =
-        TextEditingController(text: '');
-
     return Row(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -15,7 +22,8 @@ class AdresseCodePostalRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
-              controller: _adresseController,
+              onChanged: onadresseChanged,
+              initialValue: adresse,
               decoration: InputDecoration(
                 labelText: 'Adresse',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
@@ -55,7 +63,8 @@ class AdresseCodePostalRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
-              controller: _codePostalController,
+              onChanged: oncodePostalChanged,
+              initialValue: codePostal,
               decoration: InputDecoration(
                 labelText: 'Code postal',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(

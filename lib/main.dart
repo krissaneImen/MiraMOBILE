@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mira/splash_screen.dart';
+import 'package:mira/SplashScreen.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -11,6 +11,7 @@ void main() {
     ],
     supportedLocales: [
       const Locale('fr', 'FR'),
+      Locale('ar', 'AR'),
     ],
     debugShowCheckedModeBanner: false,
     home: SplashScreen(),

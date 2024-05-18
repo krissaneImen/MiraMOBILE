@@ -1,37 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class AdresseMaotamediaRow extends StatefulWidget {
-  final String? adresse;
-  final String? maotamedia;
+class AdresseMaotamediaRow extends StatelessWidget {
+  final String adresse;
+  final ValueChanged<String> onAdresseChanged;
+  final String maotamedia;
+  final ValueChanged<String> onMaotamediaChanged;
 
   const AdresseMaotamediaRow({
     Key? key,
-    this.adresse,
-    this.maotamedia,
+    required this.adresse,
+    required this.onAdresseChanged,
+    required this.maotamedia,
+    required this.onMaotamediaChanged,
   }) : super(key: key);
-
-  @override
-  _AdresseMaotamediaRowState createState() => _AdresseMaotamediaRowState();
-}
-
-class _AdresseMaotamediaRowState extends State<AdresseMaotamediaRow> {
-  final TextEditingController _adresseController = TextEditingController();
-  final TextEditingController _maotamediaController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _adresseController.text = widget.adresse ?? '';
-    _maotamediaController.text = widget.maotamedia ?? '';
-  }
-
-  @override
-  void dispose() {
-    _adresseController.dispose();
-    _maotamediaController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +24,9 @@ class _AdresseMaotamediaRowState extends State<AdresseMaotamediaRow> {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
+              onChanged: onAdresseChanged,
               textAlign: TextAlign.right,
               obscureText: false,
-              controller: _adresseController,
               decoration: InputDecoration(
                 labelText: 'العنوان',
                 hintText: 'العنوان',
@@ -93,6 +75,7 @@ class _AdresseMaotamediaRowState extends State<AdresseMaotamediaRow> {
                 filled: true,
                 fillColor: Colors.white,
               ),
+              initialValue: adresse,
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
                     color: Color(0xFF14181B),
@@ -107,9 +90,9 @@ class _AdresseMaotamediaRowState extends State<AdresseMaotamediaRow> {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
+              onChanged: onMaotamediaChanged,
               textAlign: TextAlign.right,
               obscureText: false,
-              controller: _maotamediaController,
               decoration: InputDecoration(
                 labelText: 'المعتمدية',
                 hintText: 'المعتمدية',
@@ -158,6 +141,7 @@ class _AdresseMaotamediaRowState extends State<AdresseMaotamediaRow> {
                 filled: true,
                 fillColor: Colors.white,
               ),
+              initialValue: maotamedia,
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
                     color: Color(0xFF14181B),

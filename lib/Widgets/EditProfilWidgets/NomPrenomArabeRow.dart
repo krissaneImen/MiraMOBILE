@@ -3,12 +3,17 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 
 class NomPrenomArabeRow extends StatelessWidget {
   final String? nomArabe;
+  final ValueChanged<String> onnomArabeChanged;
+
   final String? prenomArabe;
+  final ValueChanged<String> onprenomArabeChanged;
 
   const NomPrenomArabeRow({
     Key? key,
     this.nomArabe,
     this.prenomArabe,
+    required this.onnomArabeChanged,
+    required this.onprenomArabeChanged,
   }) : super(key: key);
 
   @override
@@ -20,12 +25,13 @@ class NomPrenomArabeRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
+              onChanged: onnomArabeChanged,
               textAlign: TextAlign.right,
               obscureText: false,
               initialValue: nomArabe ?? '',
               decoration: InputDecoration(
-                labelText: 'الإسم الأول',
-                hintText: 'الإسم الأول',
+                labelText: 'اللقب',
+                hintText: 'اللقب',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),
@@ -85,13 +91,13 @@ class NomPrenomArabeRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
+              onChanged: onprenomArabeChanged,
               textAlign: TextAlign.right,
               obscureText: false,
-              initialValue: prenomArabe ??
-                  '', // Utilisez une chaîne vide si prenomArabe est nul
+              initialValue: prenomArabe ?? '',
               decoration: InputDecoration(
-                labelText: 'اللقب',
-                hintText: 'اللقب',
+                labelText: 'الإسم ',
+                hintText: 'الإسم ',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
                       fontFamily: 'Plus Jakarta Sans',
                       color: Color(0xFF57636C),

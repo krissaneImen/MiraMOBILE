@@ -170,6 +170,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                                 labelText: 'Nom *',
                                 autofillHints: [AutofillHints.name],
                                 keyboardType: TextInputType.name,
+                                
                               ),
                             ),
                             Padding(
@@ -212,7 +213,8 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.all(8.0),
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 0, 0, 16),
                               child: CustomPhoneNumberField(
                                 controller: _model
                                     .phoneNumberController, // Mettez à jour cette ligne

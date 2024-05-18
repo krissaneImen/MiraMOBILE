@@ -1,32 +1,42 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/formationDetails.dart';
+import 'package:mira/Screens/MenuScreens/Actualit%C3%A9%20et%20docuements%20admin/CalendrierUniversitaire.dart';
 import 'package:mira/Screens/acceuil.dart';
 
-class FormationList extends StatefulWidget {
+class CalendriersWidget extends StatefulWidget {
   final UserModel userModel;
 
-  const FormationList({required this.userModel});
+  const CalendriersWidget({Key? key, required this.userModel})
+      : super(key: key);
 
   @override
-  _FormationListState createState() => _FormationListState();
+  State<CalendriersWidget> createState() => _CalenriersWidgetState();
 }
 
-class _FormationListState extends State<FormationList> {
-  List<dynamic> formations = [];
+class _CalenriersWidgetState extends State<CalendriersWidget> {
+  List<dynamic> calendriers = [];
   bool _isLoading = true;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
+  List<String> imageUrls = [
+    'https://images.unsplash.com/photo-1643647706050-4a011a91b7b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxjYWxlbmRyaWVyfGVufDB8fHx8MTcxNDU4NjA1OHww&ixlib=rb-4.0.3&q=80&w=1080',
+    'https://images.unsplash.com/photo-1644317167083-a719327bb3f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw4fHxjYWxlbmRyaWVyfGVufDB8fHx8MTcxNDU4NjA1OHww&ixlib=rb-4.0.3&q=80&w=1080',
+    'https://images.unsplash.com/photo-1643647705844-75abcec40a1e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyfHxjYWxlbmRyaWVyfGVufDB8fHx8MTcxNDU4NjA1OHww&ixlib=rb-4.0.3&q=80&w=1080',
+    'https://images.unsplash.com/photo-1601342630314-8427c38bf5e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8Y2FsZW5kcmllcnxlbnwwfHx8fDE3MTQ1ODYwNTh8MA&ixlib=rb-4.0.3&q=80&w=1080',
+    'https://images.unsplash.com/photo-1624969862293-b749659ccc4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyNHx8Y2FsZW5kcmllcnxlbnwwfHx8fDE3MTQ1ODYwNTh8MA&ixlib=rb-4.0.3&q=80&w=1080',
+  ];
+
   @override
   void initState() {
     super.initState();
-    _fetchFormationsData();
+    _fetchCalendrierData();
   }
 
   @override
@@ -34,10 +44,8 @@ class _FormationListState extends State<FormationList> {
     super.dispose();
   }
 
-  Future<void> _fetchFormationsData() async {
-    String statut = widget.userModel.statut;
-
-    String apiUrl = 'http://192.168.1.21:8000/formation/formations/${statut}';
+  Future<void> _fetchCalendrierData() async {
+    String apiUrl = 'http://localhost:8000/calendrier/get_Calandrier_list/';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -49,7 +57,7 @@ class _FormationListState extends State<FormationList> {
       if (response.statusCode == 200) {
         var data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
-          formations = data;
+          calendriers = data;
           _isLoading = false;
         });
       } else {
@@ -60,11 +68,11 @@ class _FormationListState extends State<FormationList> {
     }
   }
 
-  void navigateToFormationsPage(String formationsID) {
+  void navigateToCalendPage(String calendrierId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FormationsDetails(
-          formationId: formationsID,
+        builder: (context) => Calendrier(
+          calendrierId: calendrierId,
           userModel: widget.userModel,
         ),
       ),
@@ -77,7 +85,7 @@ class _FormationListState extends State<FormationList> {
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Liste de formation',
+          'Calendriers Universitaires',
           style: FlutterFlowTheme.of(context).titleLarge,
         ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
@@ -120,23 +128,20 @@ class _FormationListState extends State<FormationList> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: formations.length,
+                    itemCount: calendriers.length,
                     itemBuilder: (context, index) {
-                      var calendrier = formations[index];
-
+                      var calendrier = calendriers[index];
+                      var randomImageUrl =
+                          imageUrls[Random().nextInt(imageUrls.length)];
                       return GestureDetector(
                         onTap: () {
-                          print(
-                              "Formation ID: ${formations[index]['Identifiant']}");
-
-                          navigateToFormationsPage(
-                              formations[index]['Identifiant']);
+                          navigateToCalendPage(calendrier['id']);
                         },
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
                           child: Container(
                             width: 220,
-                            height: 300,
+                            height: 240,
                             decoration: BoxDecoration(
                               color: FlutterFlowTheme.of(context)
                                   .secondaryBackground,
@@ -168,9 +173,8 @@ class _FormationListState extends State<FormationList> {
                                         ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(8),
-                                          child: Image.memory(
-                                            base64.decode(
-                                                formations[index]['poster']),
+                                          child: Image.network(
+                                            randomImageUrl,
                                             width: double.infinity,
                                             height: double.infinity,
                                             fit: BoxFit.cover,
@@ -221,8 +225,7 @@ class _FormationListState extends State<FormationList> {
                                                                 .fromSTEB(
                                                                     8, 0, 8, 0),
                                                         child: Text(
-                                                          formations[index][
-                                                                  'intitule'] ??
+                                                          calendrier['AU'] ??
                                                               '',
                                                           style: FlutterFlowTheme
                                                                   .of(context)
@@ -248,25 +251,14 @@ class _FormationListState extends State<FormationList> {
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
                                         0, 8, 0, 0),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.arrow_forward,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Consulter le détails',
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge
-                                              .override(
-                                                fontFamily: 'Outfit',
-                                                letterSpacing: 0,
-                                              ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      calendrier['Nom'] ?? '',
+                                      style: FlutterFlowTheme.of(context)
+                                          .titleLarge
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            letterSpacing: 0,
+                                          ),
                                     ),
                                   ),
                                   Row(

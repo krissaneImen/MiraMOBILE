@@ -231,17 +231,17 @@ class _TermsOfServicePageState extends State<TermsOfServicePage>
                                 ),
                           ),
                         ),
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset(
-                              'assets/imen.png',
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        // Center(
+                        //   child: ClipRRect(
+                        //     borderRadius: BorderRadius.circular(8),
+                        //     child: Image.asset(
+                        //       'assets/imen.png',
+                        //       width: 200,
+                        //       height: 200,
+                        //       fit: BoxFit.cover,
+                        //     ),
+                        //   ),
+                        // ),
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
                           child: Container(

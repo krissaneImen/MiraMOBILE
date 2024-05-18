@@ -2,6 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
 class GenreEtatCivilRow extends StatefulWidget {
+  final String genre;
+  final String etatCivil;
+  final ValueChanged<String> onEtatCivilChanged;
+  final ValueChanged<String> onGenreChanged;
+
+  const GenreEtatCivilRow({
+    Key? key,
+    required this.genre,
+    required this.onGenreChanged,
+    required this.etatCivil,
+    required this.onEtatCivilChanged,
+  }) : super(key: key);
+
   @override
   _GenreEtatCivilRowState createState() => _GenreEtatCivilRowState();
 }
@@ -23,10 +36,11 @@ class _GenreEtatCivilRowState extends State<GenreEtatCivilRow> {
                 padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
                 child: DropdownButtonFormField(
                   value: selectedGender,
-                  onChanged: (newValue) {
+                  onChanged: (newGenre) {
                     setState(() {
-                      selectedGender = newValue!;
+                      selectedGender = newGenre.toString();
                     });
+                    widget.onGenreChanged(newGenre.toString());
                   },
                   decoration: InputDecoration(
                     labelText: 'Genre',
@@ -53,7 +67,7 @@ class _GenreEtatCivilRowState extends State<GenreEtatCivilRow> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  items: ['Féminin', 'Masculin']
+                  items: ['Féminin', 'Masculin', 'Autres']
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -68,10 +82,11 @@ class _GenreEtatCivilRowState extends State<GenreEtatCivilRow> {
                 padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
                 child: DropdownButtonFormField(
                   value: selectedCivilStatus,
-                  onChanged: (newValue) {
+                  onChanged: (newEtatCivil) {
                     setState(() {
-                      selectedCivilStatus = newValue!;
+                      selectedCivilStatus = newEtatCivil.toString();
                     });
+                    widget.onEtatCivilChanged(newEtatCivil.toString());
                   },
                   decoration: InputDecoration(
                     labelText: 'État civil',

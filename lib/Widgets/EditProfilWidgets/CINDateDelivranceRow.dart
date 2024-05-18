@@ -1,14 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
+class Editprofil extends StatefulWidget {
+  const Editprofil({
+    Key? key,
+    required this.cin,
+  }) : super(key: key);
+  final String cin;
+
+  @override
+  State<Editprofil> createState() => _EditprofilWidgetState();
+}
+
+class _EditprofilWidgetState extends State<Editprofil> {
+  late String codePostal = '';
+  late String gouvernerat = '';
+  late String genre = '';
+  late String etatCivil = '';
+  late DateTime dateNaissance = DateTime.now();
+  late String lieuNaissanceArabe = '';
+  late String adresseArabe = '';
+  late String delegationArabe = '';
+  late String nomArabe = '';
+  late String prenom_arabe = '';
+  late String _profileImageUrl = '';
+  late String _email = '';
+  late String PhoneNumber = '';
+  late String nationalite = '';
+  late String nom = '';
+  late String prenom = '';
+  late DateTime _dateDelivrance = DateTime.now();
+  late bool _isLoading = true;
+  late String base64Image = '';
+  late DateTime _selectedDate = DateTime.now();
+  late String formattedDate = '';
+  late String delegation = '';
+  late String lieuNaissance = '';
+  late String adresse = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileData();
+    _selectedDate = DateTime.now();
+  }
+
+  Future<void> _fetchProfileData() async {
+    // Implement your profile data fetching logic here
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Editer Votre Profil'),
+      ),
+      body: SingleChildScrollView(
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 20),
+                    // Your profile editing widgets here
+                    CINDateDelivranceRow(
+                      cin: widget.cin,
+                      dateDelivrance: _dateDelivrance,
+                      onDateChanged: (newDate) {
+                        setState(() {
+                          _dateDelivrance = newDate;
+                        });
+                      },
+                    ),
+                    // Other profile editing widgets...
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+}
+
 class CINDateDelivranceRow extends StatefulWidget {
   final String cin;
-  late final DateTime
-      dateDelivrance; // Modifier la propriété en tant qu'objet DateTime
+  final DateTime dateDelivrance;
+  final ValueChanged<DateTime> onDateChanged;
 
   CINDateDelivranceRow({
     required this.cin,
     required this.dateDelivrance,
+    required this.onDateChanged,
   });
 
   @override
@@ -21,8 +104,8 @@ class _CINDateDelivranceRowState extends State<CINDateDelivranceRow> {
   @override
   void initState() {
     super.initState();
-    _dateController =
-        TextEditingController(text: widget.dateDelivrance.toString());
+    _dateController = TextEditingController(
+        text: DateFormat('dd/MM/yyyy').format(widget.dateDelivrance));
   }
 
   @override
@@ -34,21 +117,16 @@ class _CINDateDelivranceRowState extends State<CINDateDelivranceRow> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: widget
-          .dateDelivrance, // Utiliser la date de délivrance actuelle comme date initiale
+      initialDate: widget.dateDelivrance,
       firstDate: DateTime(1900),
       lastDate: DateTime(2101),
     );
-    if (picked != null &&
-        picked !=
-            widget
-                .dateDelivrance) // Vérifier si une nouvelle date a été sélectionnée
+    if (picked != null && picked != widget.dateDelivrance) {
       setState(() {
-        widget.dateDelivrance =
-            picked; // Mettre à jour la date de délivrance dans le widget parent
-        _dateController.text = picked
-            .toString(); // Mettre à jour la valeur du champ de texte avec la nouvelle date
+        widget.onDateChanged(picked);
+        _dateController.text = picked.toString();
       });
+    }
   }
 
   @override

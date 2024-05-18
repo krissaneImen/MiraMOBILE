@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:mira/Screens/AuthScreens/login.dart';
 import 'package:mira/Screens/acceuil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserModel extends ChangeNotifier {
   late String? _selectedRole;
@@ -14,6 +16,7 @@ class UserModel extends ChangeNotifier {
   late String email = '';
   late String cin = '';
   late int phoneNumber;
+  late Image profileImage = Image.asset('assets/default_avatar.jpeg');
   late bool passwordVisibility;
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
@@ -26,6 +29,7 @@ class UserModel extends ChangeNotifier {
   late TextEditingController _resetPasswordController;
   late Function(String) _showSnackBar;
   late String _photoBase64;
+  late String titre;
 
   UserModel(this._showSnackBar) {
     passwordVisibility = false;
@@ -39,6 +43,7 @@ class UserModel extends ChangeNotifier {
     _passwordController = TextEditingController();
     _resetPasswordController = TextEditingController();
   }
+
   void setSelectedRole(String? role) {
     _selectedRole = role;
     notifyListeners();
@@ -55,10 +60,11 @@ class UserModel extends ChangeNotifier {
   TextEditingController get passwordController => _passwordController;
   TextEditingController get resetPasswordController => _resetPasswordController;
   String? getPhotoBase64() => _photoBase64;
-//Connexion
+
+  // Connexion
   Future<void> loginUser(BuildContext context) async {
     try {
-      var url = Uri.parse('http://172.16.26.185:8000/users/login/');
+      var url = Uri.parse('http://localhost:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
       var body = json.encode({
         'cin': _cinController.text,
@@ -69,26 +75,14 @@ class UserModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
+        await startSession();
 
         firstName = userData['firstName'] ?? '';
         lastName = userData['lastName'] ?? '';
         statut = userData['statut'] ?? '';
         email = userData['email'] ?? '';
         cin = userData['cin'] ?? '';
-        int? phoneNumber = userData['phoneNumber'] != null
-            ? int.parse(userData['phoneNumber'].toString())
-            : null;
-        DateTime? date_de_delivrance;
-        String? dateString = userData['dateDeDelivrance'];
-
-        if (dateString != null) {
-          try {
-            date_de_delivrance = DateTime.parse(dateString);
-          } catch (e) {
-            // Gérer l'erreur de format de date ici
-            print('Erreur lors de l\'analyse de la date: $e');
-          }
-        }
+        titre = userData['titre'] ?? '';
 
         notifyListeners();
 
@@ -119,13 +113,28 @@ class UserModel extends ChangeNotifier {
     _statutController.dispose();
     _passwordController.dispose();
     _resetPasswordController.dispose();
+
     super.dispose();
+  }
+
+  Future<void> clearSession(BuildContext context) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove(
+          'isAuthenticated'); // Supprimez la clé 'isAuthenticated' de SharedPreferences
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      print('Error clearing session: $e');
+    }
   }
 
   Future<void> registerUser(BuildContext context) async {
     try {
-      var userUrl = Uri.parse('http://172.16.26.185:8000/users/register/');
-      var profileUrl = Uri.parse('http://172.16.26.185:8000/profil/create/');
+      var userUrl = Uri.parse('http://localhost:8000/users/register/');
+      var profileUrl = Uri.parse('http://localhost:8000/profil/create/');
 
       var headers = {'Content-Type': 'application/json'};
       var userBody = json.encode({
@@ -189,6 +198,49 @@ class UserModel extends ChangeNotifier {
     } catch (e) {
       _showSnackBar('Erreur lors de l\'inscription: $e');
       print('Error during registration: $e');
+    }
+  }
+
+  Future<void> startSession() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isAuthenticated', true);
+      print('Session started successfully');
+    } catch (e) {
+      print('Error starting session: $e');
+    }
+  }
+
+  Future<bool> isSessionActive() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isAuthenticated') ?? false;
+  }
+
+  Future<void> getProfileImage() async {
+    if (cin == null) {
+      print('CIN est null');
+      return;
+    }
+    String apiUrl = 'http://localhost:8000/profil/profiles/cin/$cin';
+
+    try {
+      var response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        var profileData = json.decode(response.body);
+
+        String base64Image = profileData['image'];
+
+        if (base64Image.isNotEmpty) {
+          List<int> imageBytes = base64.decode(base64Image);
+          profileImage = Image.memory(Uint8List.fromList(imageBytes));
+          notifyListeners();
+        }
+      } else {
+        print('Failed to load profile image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading profile image: $e');
     }
   }
 }

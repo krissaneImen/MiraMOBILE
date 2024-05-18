@@ -1,7 +1,10 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/NouveautesPage.dart';
+import 'package:mira/Screens/MenuScreens/Actualit%C3%A9%20et%20docuements%20admin/Calendriers.dart';
+import 'package:mira/Screens/MenuScreens/Cours.dart';
+import 'package:mira/Screens/MenuScreens/ActualityPage.dart';
 import 'package:mira/Screens/Profil.dart';
 import 'package:mira/Widgets/HomeWidgets/AdministratifDrawer.dart';
 import 'package:mira/Widgets/HomeWidgets/EnseignantDrawer.dart';
@@ -18,6 +21,13 @@ class Accueil extends StatefulWidget {
 
 class _AccueilState extends State<Accueil> {
   int _selectedIndex = 0;
+  late GlobalKey<ScaffoldState> _scaffoldKey;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaffoldKey = GlobalKey<ScaffoldState>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +44,30 @@ class _AccueilState extends State<Accueil> {
         );
         break;
       case 'Etudiant':
-        drawerWidget = EtudiantDrawer();
+        drawerWidget = EtudiantDrawer(
+          userModel: widget.userModel,
+        );
         break;
       default:
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Erreur'),
+                content: Text("Vous n'avez pas un compte"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        });
         drawerWidget = Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
@@ -56,13 +87,13 @@ class _AccueilState extends State<Accueil> {
               ListTile(
                 title: Text('Item 1'),
                 onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter lorsque l'élément 1 est sélectionné dans la barre de navigation latérale
+                  // Put your code here for handling item 1 tap in the drawer
                 },
               ),
               ListTile(
                 title: Text('Item 2'),
                 onTap: () {
-                  // Mettez ici le code que vous souhaitez exécuter lorsque l'élément 2 est sélectionné dans la barre de navigation latérale
+                  // Put your code here for handling item 2 tap in the drawer
                 },
               ),
             ],
@@ -72,23 +103,20 @@ class _AccueilState extends State<Accueil> {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Iset Tataouine'),
         automaticallyImplyLeading: false,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-        leading: Builder(
-          builder: (context) => FlutterFlowIconButton(
-            borderRadius: 30,
-            buttonSize: 60,
-            icon: Icon(
-              Icons.menu_rounded,
-              color: FlutterFlowTheme.of(context).primaryText,
-              size: 30,
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+        leading: FlutterFlowIconButton(
+          borderRadius: 30,
+          buttonSize: 60,
+          icon: Icon(
+            Icons.menu_rounded,
+            color: FlutterFlowTheme.of(context).primaryText,
+            size: 30,
           ),
+          onPressed: _onMenuButtonPressed,
         ),
       ),
       drawer: drawerWidget,
@@ -107,95 +135,119 @@ class _AccueilState extends State<Accueil> {
                     ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => NouveautesPage(
-                            userModel: widget.userModel,
-                          )),
-                );
-              },
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/act.jpeg',
-                        width: MediaQuery.of(context).size.width *
-                            0.9, // Ajustez la largeur de l'image en fonction de la largeur de l'écran
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(16, 16, 0, 12),
+              child: Text(
+                'Calendriers universitaires',
+                style: FlutterFlowTheme.of(context).labelMedium.override(
+                      fontFamily: 'Readex Pro',
+                      letterSpacing: 0,
                     ),
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Toutes les actualités',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                // Naviguer vers la page des manifestations
-              },
-              child: Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16, 16, 16, 0),
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/man.jpeg',
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 16,
-                      left: 16,
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Toutes les manifestations',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CalendriersWidget(
+                              userModel: widget.userModel,
+                            )),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 3,
+                        color: Color(0x411D2429),
+                        offset: Offset(0.0, 1),
+                      )
+                    ],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 1, 1, 1),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.network(
+                              'https://images.unsplash.com/photo-1601342630314-8427c38bf5e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyMHx8Y2FsZW5kcmllcnxlbnwwfHx8fDE3MTQ1ODYwNTh8MA&ixlib=rb-4.0.3&q=80&w=1080',
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(8, 8, 4, 0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Calendriers Universitaires',
+                                  style: FlutterFlowTheme.of(context)
+                                      .headlineSmall
+                                      .override(
+                                        fontFamily: 'Outfit',
+                                        letterSpacing: 0,
+                                      ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0, 4, 8, 0),
+                                  child: AutoSizeText(
+                                    'Voir tous',
+                                    textAlign: TextAlign.start,
+                                    style: FlutterFlowTheme.of(context)
+                                        .labelMedium
+                                        .override(
+                                          fontFamily: 'Readex Pro',
+                                          letterSpacing: 0,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                              child: Icon(
+                                Icons.chevron_right_rounded,
+                                color: Color(0xFF57636C),
+                                size: 24,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 12, 4, 8),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -207,7 +259,7 @@ class _AccueilState extends State<Accueil> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_filled),
-            label: 'Acceuil',
+            label: 'Accueil',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.school_rounded),
@@ -215,7 +267,7 @@ class _AccueilState extends State<Accueil> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.event_note_rounded),
-            label: 'Evenements',
+            label: 'Actualités',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle_outlined),
@@ -233,19 +285,26 @@ class _AccueilState extends State<Accueil> {
 
     switch (index) {
       case 0:
-        // Naviguer vers la page d'accueil
-        // Ajoutez la logique de navigation appropriée ici
         break;
       case 1:
-        // Naviguer vers la page des cours
-        // Ajoutez la logique de navigation appropriée ici
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => CoursWidget(
+                    userModel: widget.userModel,
+                  )),
+        );
         break;
       case 2:
-        // Naviguer vers la page des événements
-        // Ajoutez la logique de navigation appropriée ici
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ActualiteWidget(
+                    userModel: widget.userModel,
+                  )),
+        );
         break;
       case 3:
-        // Naviguer vers la page de profil
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -257,9 +316,12 @@ class _AccueilState extends State<Accueil> {
                   )),
         );
         break;
-
       default:
         break;
     }
+  }
+
+  void _onMenuButtonPressed() {
+    _scaffoldKey.currentState?.openDrawer();
   }
 }

@@ -37,8 +37,7 @@ class _ProfileWidgetState extends State<Profile> {
   }
 
   Future<void> _getProfileImage() async {
-    String apiUrl =
-        'http://172.16.26.185:8000/profil/profiles/cin/${widget.cin}';
+    String apiUrl = 'http://localhost:8000/profil/profiles/cin/${widget.cin}';
 
     try {
       var response = await http.get(Uri.parse(apiUrl));

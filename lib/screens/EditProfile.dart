@@ -5,15 +5,15 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:mira/Models/ProfileModel.dart';
+import 'package:mira/Provider/ProfileModel.dart';
 import 'package:mira/Widgets/EditProfilWidgets/AdresseCodePostalRow.dart';
 import 'package:mira/Widgets/EditProfilWidgets/Adressearabe.dart';
 import 'package:mira/Widgets/EditProfilWidgets/DateLieuNaissanceRow.dart';
 import 'package:mira/Widgets/EditProfilWidgets/CINDateDelivranceRow.dart';
 import 'package:mira/Widgets/EditProfilWidgets/GenderRow.dart';
+import 'package:mira/Widgets/EditProfilWidgets/NationaliteRow.dart';
 import 'package:mira/Widgets/EditProfilWidgets/NomPrenomArabeRow.dart';
 import 'package:mira/Widgets/EditProfilWidgets/NomPrenomRow.dart';
-import 'package:intl/intl.dart';
 
 class Editprofil extends StatefulWidget {
   const Editprofil({
@@ -47,10 +47,8 @@ class _EditprofilWidgetState extends State<Editprofil> {
   late ProfileModel model;
   bool _isLoading = true;
   String base64Image = '';
-  late DateTime _selectedDate = DateTime.now();
   String formattedDate = '';
   String delegation = '';
-  String lieuDeNaissanceArabe = '';
   late String lieuNaissance = '';
   late String adresse = '';
 
@@ -59,8 +57,6 @@ class _EditprofilWidgetState extends State<Editprofil> {
     super.initState();
     model = ProfileModel();
     _fetchProfileData();
-    _selectedDate = DateTime.now();
-    // Convertir la date de délivrance en format ISO 8601
   }
 
   Image imageFromBase64String(String base64String) {
@@ -112,39 +108,43 @@ class _EditprofilWidgetState extends State<Editprofil> {
   }
 
   Future<void> _fetchProfileData() async {
-    String apiUrl =
-        'http://172.16.26.185:8000/profil/profiles/cin/${widget.cin}';
-
+    String apiUrl = 'http://localhost:8000/profil/profiles/cin/${widget.cin}';
     try {
-      var response = await http.get(Uri.parse(apiUrl));
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept-Charset':
+              'utf-8', // Spécifiez l'encodage dans l'en-tête de la requête
+        },
+      );
 
       if (response.statusCode == 200) {
-        var profileData = json.decode(response.body);
+        var profileData = json.decode(
+            utf8.decode(response.bodyBytes)); // Décodez les données avec l'enc
 
         setState(() {
+          nom = profileData['firstName'] ?? '';
+          prenom = profileData['lastName'] ?? '';
+          nomArabe = profileData['nomArabe'] ?? '';
+          prenom_arabe = profileData['prenom_arabe'] ?? '';
           _email = profileData['email'] ?? '';
           PhoneNumber = profileData['phoneNumber'] ?? '';
-          nom = profileData['firstName'] ?? '';
-          prenom_arabe = profileData['prenom_arabe'] ?? '';
-          nomArabe = profileData['nomArabe'] ?? '';
-          prenom = profileData['lastName'] ?? '';
           lieuNaissanceArabe = profileData['lieuNaissanceArabe'] ?? '';
           adresseArabe = profileData['adresseArabe'] ?? '';
           delegationArabe = profileData['delegationArabe'] ?? '';
           genre = profileData['genre'] ?? '';
           _dateDelivrance = DateTime.parse(profileData['dateDeDelivrance']);
           _profileImageUrl = profileData['image'] ?? '';
-          gouvernerat = profileData['gouvernerat'] ?? '';
+          gouvernerat = profileData['gouvernorat'] ?? '';
+          delegation = profileData['delegation'] ?? '';
           lieuNaissance = profileData['lieuNaissance'] ?? '';
           etatCivil = profileData['etatCivil'] ?? '';
           nationalite = profileData['nationalite'] ?? '';
-
           String dateNaissanceString = profileData['dateNaissance'] ?? '';
           dateNaissance = dateNaissanceString.isNotEmpty
               ? DateTime.parse(dateNaissanceString)
               : DateTime
                   .now(); // Vérification si la date n'est pas vide avant de la parser
-
           adresse = profileData['adresse'] ?? '';
           codePostal = profileData['codePostal'] ?? '';
           _isLoading = false;
@@ -212,6 +212,11 @@ class _EditprofilWidgetState extends State<Editprofil> {
                       CINDateDelivranceRow(
                         cin: widget.cin,
                         dateDelivrance: _dateDelivrance,
+                        onDateChanged: (DateTime value) {
+                          setState(() {
+                            _dateDelivrance = value;
+                          });
+                        },
                       ),
                       NomPrenomRow(
                         nom: nom,
@@ -319,10 +324,10 @@ class _EditprofilWidgetState extends State<Editprofil> {
                         ),
                       ),
                       DateLieuNaissanceRow(
-                        selectedDate: _selectedDate,
+                        selectedDate: dateNaissance,
                         onDateChanged: (newDate) {
                           setState(() {
-                            _selectedDate = newDate;
+                            dateNaissance = newDate;
                           });
                         },
                         lieuNaissance: lieuNaissance,
@@ -333,51 +338,41 @@ class _EditprofilWidgetState extends State<Editprofil> {
                         },
                       ),
 
-                      AdresseCodePostalRow(),
-                      GenreEtatCivilRow(),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'Nationalité',
-                                  labelStyle: TextStyle(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF57636C),
-                                    fontSize: 14,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFF4B39EF),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                style: TextStyle(
-                                  fontFamily: 'Plus Jakarta Sans',
-                                  color: Color(0xFF14181B),
-                                  fontSize: 14,
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      AdresseCodePostalRow(
+                        adresse: adresse,
+                        onadresseChanged: (value) {
+                          setState(() {
+                            adresse = value;
+                          });
+                        },
+                        codePostal: codePostal,
+                        oncodePostalChanged: (value) {
+                          setState(() {
+                            codePostal = value;
+                          });
+                        },
+                      ),
+                      GenreEtatCivilRow(
+                        genre: genre,
+                        onGenreChanged: (String value) {
+                          setState(() {
+                            genre = value;
+                          });
+                        },
+                        etatCivil: etatCivil,
+                        onEtatCivilChanged: (String value) {
+                          setState(() {
+                            etatCivil = value;
+                          });
+                        },
+                      ),
+                      NationaliteRow(
+                        nationalite: nationalite,
+                        onChanged: (String value) {
+                          setState(() {
+                            nationalite = value;
+                          });
+                        },
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.max,
@@ -389,10 +384,10 @@ class _EditprofilWidgetState extends State<Editprofil> {
                               child: TextFormField(
                                 onChanged: (value) {
                                   setState(() {
-                                    gouvernerat =
-                                        value; // Mettre à jour la valeur de gouvernerat lorsque l'utilisateur change le texte dans le champ
+                                    gouvernerat = value;
                                   });
                                 },
+                                initialValue: gouvernerat,
                                 decoration: InputDecoration(
                                   labelText: 'Gouvernerat',
                                   labelStyle: TextStyle(
@@ -443,6 +438,7 @@ class _EditprofilWidgetState extends State<Editprofil> {
                                     delegation = value;
                                   });
                                 },
+                                initialValue: delegation,
                                 decoration: InputDecoration(
                                   labelText: 'Délégation',
                                   labelStyle: TextStyle(
@@ -479,80 +475,76 @@ class _EditprofilWidgetState extends State<Editprofil> {
                           ),
                         ],
                       ),
-                      NomPrenomArabeRow(),
-                      AdresseMaotamediaRow(
-                        adresse: '',
-                        maotamedia: '',
+                      NomPrenomArabeRow(
+                        nomArabe: nomArabe,
+                        prenomArabe: prenom_arabe,
+                        onnomArabeChanged: (value) {
+                          setState(() {
+                            nomArabe = value;
+                          });
+                        },
+                        onprenomArabeChanged: (value) {
+                          setState(() {
+                            prenom_arabe = value;
+                          });
+                        },
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                              child: TextFormField(
-                                textAlign: TextAlign.right,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'مكان الولادة',
-                                  hintText: 'مكان الولادة',
-                                  labelStyle: TextStyle(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF57636C),
-                                    fontSize: 14,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  hintStyle: TextStyle(
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    color: Color(0xFF57636C),
-                                    fontSize: 14,
-                                    letterSpacing: 0,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFE0E3E7),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFF4B39EF),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color(0xFFFF5963),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                ),
-                                style: TextStyle(
-                                  fontFamily: 'Plus Jakarta Sans',
-                                  color: Color(0xFF14181B),
-                                  fontSize: 14,
-                                  letterSpacing: 0,
-                                  fontWeight: FontWeight.normal,
-                                ),
+                      AdresseMaotamediaRow(
+                        adresse: adresseArabe,
+                        maotamedia: delegationArabe,
+                        onAdresseChanged: (value) {
+                          setState(() {
+                            adresseArabe = value;
+                          });
+                        },
+                        onMaotamediaChanged: (value) {
+                          setState(() {
+                            delegationArabe = value;
+                          });
+                        },
+                      ),
+
+                      Container(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                        child: TextFormField(
+                          initialValue: lieuNaissanceArabe,
+                          onChanged: (value) {
+                            setState(() {
+                              lieuNaissanceArabe = value;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'مكان الولادة',
+                            labelStyle: TextStyle(
+                              fontFamily: 'Plus Jakarta Sans',
+                              color: Color(0xFF57636C),
+                              fontSize: 14,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xFFE0E3E7),
+                                width: 2,
                               ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color(0xFF4B39EF),
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                        ],
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            color: Color(0xFF14181B),
+                            fontSize: 14,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
                       ),
 
                       Container(
@@ -580,8 +572,9 @@ class _EditprofilWidgetState extends State<Editprofil> {
                               lieuNaissance: lieuNaissance,
                               adresse: adresse,
                               codePostal: codePostal,
-                              image:
-                                  base64Image, // Utilisation de l'image encodée en base64
+                              image: base64Image,
+                              context:
+                                  context, // Utilisation de l'image encodée en base64
                             );
                           },
                           text: 'Enregistrer',

@@ -75,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 SizedBox(height: 20),
                 // Texte "By Mira"
                 Text(
-                  'By Mira',
+                  'Mira',
                   style: GoogleFonts.dancingScript(
                     textStyle: TextStyle(
                       fontSize: 24,

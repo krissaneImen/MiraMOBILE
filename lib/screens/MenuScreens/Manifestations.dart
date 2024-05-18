@@ -1,24 +1,24 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/formationDetails.dart';
+import 'package:mira/Screens/MenuScreens/Manifestation.dart';
 import 'package:mira/Screens/acceuil.dart';
 
-class FormationList extends StatefulWidget {
+class ManifestationsWidget extends StatefulWidget {
   final UserModel userModel;
 
-  const FormationList({required this.userModel});
+  const ManifestationsWidget({Key? key, required this.userModel})
+      : super(key: key);
 
   @override
-  _FormationListState createState() => _FormationListState();
+  State<ManifestationsWidget> createState() => _CalenriersWidgetState();
 }
 
-class _FormationListState extends State<FormationList> {
-  List<dynamic> formations = [];
+class _CalenriersWidgetState extends State<ManifestationsWidget> {
+  List<dynamic> manifestations = [];
   bool _isLoading = true;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -26,7 +26,7 @@ class _FormationListState extends State<FormationList> {
   @override
   void initState() {
     super.initState();
-    _fetchFormationsData();
+    _fetchManifestationsData();
   }
 
   @override
@@ -34,10 +34,11 @@ class _FormationListState extends State<FormationList> {
     super.dispose();
   }
 
-  Future<void> _fetchFormationsData() async {
+  Future<void> _fetchManifestationsData() async {
     String statut = widget.userModel.statut;
 
-    String apiUrl = 'http://192.168.1.21:8000/formation/formations/${statut}';
+    String apiUrl =
+        'http://192.168.1.21:8000/manifestation/manifestations/${statut}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -49,7 +50,7 @@ class _FormationListState extends State<FormationList> {
       if (response.statusCode == 200) {
         var data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
-          formations = data;
+          manifestations = data;
           _isLoading = false;
         });
       } else {
@@ -60,11 +61,11 @@ class _FormationListState extends State<FormationList> {
     }
   }
 
-  void navigateToFormationsPage(String formationsID) {
+  void navigateTomanifesPage(String manifestationId) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FormationsDetails(
-          formationId: formationsID,
+        builder: (context) => Manifestation(
+          manifestationId: manifestationId,
           userModel: widget.userModel,
         ),
       ),
@@ -77,7 +78,7 @@ class _FormationListState extends State<FormationList> {
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Liste de formation',
+          'Manifestations',
           style: FlutterFlowTheme.of(context).titleLarge,
         ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
@@ -120,23 +121,21 @@ class _FormationListState extends State<FormationList> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: formations.length,
+                    itemCount: manifestations.length,
                     itemBuilder: (context, index) {
-                      var calendrier = formations[index];
+                      var calendrier = manifestations[index];
 
                       return GestureDetector(
                         onTap: () {
-                          print(
-                              "Formation ID: ${formations[index]['Identifiant']}");
-
-                          navigateToFormationsPage(
-                              formations[index]['Identifiant']);
+                          print(manifestations[index]['Identifiant']);
+                          navigateTomanifesPage(
+                              manifestations[index]['Identifiant']);
                         },
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
                           child: Container(
                             width: 220,
-                            height: 300,
+                            height: 240,
                             decoration: BoxDecoration(
                               color: FlutterFlowTheme.of(context)
                                   .secondaryBackground,
@@ -169,8 +168,8 @@ class _FormationListState extends State<FormationList> {
                                           borderRadius:
                                               BorderRadius.circular(8),
                                           child: Image.memory(
-                                            base64.decode(
-                                                formations[index]['poster']),
+                                            base64.decode(manifestations[index]
+                                                ['poster']),
                                             width: double.infinity,
                                             height: double.infinity,
                                             fit: BoxFit.cover,
@@ -221,7 +220,7 @@ class _FormationListState extends State<FormationList> {
                                                                 .fromSTEB(
                                                                     8, 0, 8, 0),
                                                         child: Text(
-                                                          formations[index][
+                                                          manifestations[index][
                                                                   'intitule'] ??
                                                               '',
                                                           style: FlutterFlowTheme
@@ -248,25 +247,14 @@ class _FormationListState extends State<FormationList> {
                                   Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
                                         0, 8, 0, 0),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.arrow_forward,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primary,
-                                          size: 24,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Consulter le détails',
-                                          style: FlutterFlowTheme.of(context)
-                                              .titleLarge
-                                              .override(
-                                                fontFamily: 'Outfit',
-                                                letterSpacing: 0,
-                                              ),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      manifestations[index]['slogan'] ?? '',
+                                      style: FlutterFlowTheme.of(context)
+                                          .titleLarge
+                                          .override(
+                                            fontFamily: 'Outfit',
+                                            letterSpacing: 0,
+                                          ),
                                     ),
                                   ),
                                   Row(
@@ -282,9 +270,9 @@ class _FormationListState extends State<FormationList> {
                                             text: TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text:
-                                                      calendrier['semestre'] ??
-                                                          '',
+                                                  text: manifestations[index]
+                                                          ['dateDebut'] ??
+                                                      '',
                                                   style: TextStyle(
                                                     color: FlutterFlowTheme.of(
                                                             context)

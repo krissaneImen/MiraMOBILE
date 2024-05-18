@@ -65,6 +65,7 @@ class CustomTextFormField extends StatelessWidget {
             ),
             filled: true,
             fillColor: Color(0xFFF1F4F8),
+            
           ),
           style: FlutterFlowTheme.of(context).bodyLarge.override(
                 fontFamily: 'Plus Jakarta Sans',
@@ -72,6 +73,7 @@ class CustomTextFormField extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
+              
           keyboardType: keyboardType,
           validator: validator, // Utilisation de la fonction de validation
         ),

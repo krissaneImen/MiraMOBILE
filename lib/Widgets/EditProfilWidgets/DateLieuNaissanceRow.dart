@@ -1,18 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 
-class DateLieuNaissanceRow extends StatelessWidget {
+class DateLieuNaissanceRow extends StatefulWidget {
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateChanged;
   final String lieuNaissance;
   final ValueChanged<String> onLieuNaissanceChanged;
 
   const DateLieuNaissanceRow({
+    Key? key,
     required this.selectedDate,
     required this.onDateChanged,
     required this.lieuNaissance,
     required this.onLieuNaissanceChanged,
-  });
+  }) : super(key: key);
+
+  @override
+  _DateLieuNaissanceRowState createState() => _DateLieuNaissanceRowState();
+}
+
+class _DateLieuNaissanceRowState extends State<DateLieuNaissanceRow> {
+  late TextEditingController _dateController;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateController = TextEditingController(
+        text: DateFormat('dd/MM/yyyy').format(widget.selectedDate));
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: widget.selectedDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      widget.onDateChanged(pickedDate);
+      setState(() {
+        _dateController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +59,7 @@ class DateLieuNaissanceRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0, 16, 8, 0),
             child: TextFormField(
-              readOnly: true, // Rendre le champ en lecture seule
+              readOnly: true,
               decoration: InputDecoration(
                 labelText: 'Date de naissance',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(
@@ -47,7 +83,6 @@ class DateLieuNaissanceRow extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                // Autres propriétés de décoration selon vos besoins
               ),
               style: FlutterFlowTheme.of(context).bodyMedium.override(
                     fontFamily: 'Plus Jakarta Sans',
@@ -56,21 +91,8 @@ class DateLieuNaissanceRow extends StatelessWidget {
                     letterSpacing: 0,
                     fontWeight: FontWeight.normal,
                   ),
-              onTap: () async {
-                final pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
-                );
-                if (pickedDate != null) {
-                  onDateChanged(pickedDate);
-                }
-              },
-              // Afficher la date sélectionnée dans le champ
-              controller: TextEditingController(
-                text: DateFormat('dd/MM/yyyy').format(selectedDate),
-              ),
+              onTap: () => _selectDate(context),
+              controller: _dateController,
             ),
           ),
         ),
@@ -78,8 +100,8 @@ class DateLieuNaissanceRow extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(8, 16, 0, 0),
             child: TextFormField(
-              onChanged: onLieuNaissanceChanged,
-              initialValue: lieuNaissance,
+              onChanged: widget.onLieuNaissanceChanged,
+              initialValue: widget.lieuNaissance,
               decoration: InputDecoration(
                 labelText: 'Lieu de naissance',
                 labelStyle: FlutterFlowTheme.of(context).labelMedium.override(

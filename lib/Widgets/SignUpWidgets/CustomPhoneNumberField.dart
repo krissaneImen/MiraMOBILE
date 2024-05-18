@@ -25,6 +25,9 @@ class _CustomPhoneNumberFieldState extends State<CustomPhoneNumberField> {
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 20),
       child: IntlPhoneField(
+        languageCode: 'fr',
+        searchText: 'Rechercher',
+        keyboardType: TextInputType.phone,
         controller: widget.controller,
         decoration: InputDecoration(
           labelText: widget.labelText,
