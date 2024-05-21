@@ -92,13 +92,20 @@ class _StudentJournalsState extends State<StudentJournals> {
                 final journal = journals[index];
                 return GestureDetector(
                   onTap: () {
-                    String journalId = journal['id'];
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => JournalDetails(
-                        userModel: widget.userModel,
-                        journalId: journalId,
-                      ),
-                    ));
+                    if (journal.containsKey('id')) {
+                      String journalId = journal['id'];
+                      print('Journal ID: $journalId');
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => JournalDetails(
+                          userModel: widget.userModel,
+                          journalId: journalId,
+                          // Passer les données du journal à JournalDetails
+                          journalData: journal,
+                        ),
+                      ));
+                    } else {
+                      print('Error: Journal ID not found.');
+                    }
                   },
                   child: Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),

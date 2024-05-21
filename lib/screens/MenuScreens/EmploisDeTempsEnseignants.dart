@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/acceuil.dart';
 
-class EnseignantEmploiWidget extends StatefulWidget {
+class EmploiWidget extends StatefulWidget {
   final UserModel userModel;
-  const EnseignantEmploiWidget({super.key, required this.userModel});
+  const EmploiWidget({super.key, required this.userModel});
 
   @override
-  State<EnseignantEmploiWidget> createState() => _EnseignantEmploiWidgetState();
+  State<EmploiWidget> createState() => _EmploiWidgetState();
 }
 
-class _EnseignantEmploiWidgetState extends State<EnseignantEmploiWidget> {
+class _EmploiWidgetState extends State<EmploiWidget> {
   List<dynamic> EmploisEnseignants = [];
   bool _isLoading = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
@@ -37,7 +36,7 @@ class _FormationListState extends State<FormationList> {
   Future<void> _fetchFormationsData() async {
     String statut = widget.userModel.statut;
 
-    String apiUrl = 'http://192.168.1.21:8000/formation/formations/${statut}';
+    String apiUrl = 'http://localhost:8000/formation/formations/${statut}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),

@@ -33,7 +33,7 @@ class _FormationsDetailsState extends State<FormationsDetails> {
     print('Formation ID: ${widget.formationId}');
 
     String apiUrl =
-        'http://192.168.1.21:8000/formation/getFormation/${widget.formationId}';
+        'http://localhost:8000/formation/getFormation/${widget.formationId}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),

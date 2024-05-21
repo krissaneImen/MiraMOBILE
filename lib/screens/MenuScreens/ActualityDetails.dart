@@ -104,7 +104,7 @@ class _DetailsActualiteWidgetState extends State<DetailsActualiteWidget>
 
   Future<void> _openPdf(BuildContext context) async {
     final url =
-        'http://192.168.1.21:8000/actualite/open_pdf/${widget.actualiteId}';
+        'http://localhost:8000/actualite/open_pdf/${widget.actualiteId}';
 
     try {
       // Ouvrir le PDF dans une visionneuse PDF externe

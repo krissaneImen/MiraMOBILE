@@ -4,6 +4,7 @@ import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/Journals.dart';
 import 'package:mira/Screens/MenuScreens/photoCopies.dart';
 import 'package:mira/Screens/acceuil.dart';
+import 'package:mira/Screens/aporoposstage.dart';
 
 class Stages extends StatefulWidget {
   final UserModel userModel;
@@ -130,7 +131,7 @@ class _StagesState extends State<Stages> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PhotocopieWidget(
+                          builder: (context) => ListeWidget(
                             userModel: widget.userModel,
                           ),
                         ),
@@ -273,6 +274,68 @@ class _StagesState extends State<Stages> {
                           children: [
                             Text(
                               'Journaux de stages',
+                              style: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 24,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
+                  child: InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      // Navigation vers la page StudentJournals lorsque le bouton "Journaux de stages" est cliqué
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StudentJournals(
+                            cin: widget.userModel.cin,
+                            userModel: widget.userModel,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3,
+                            color: Color(0x33000000),
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          )
+                        ],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Soutenances de stages',
                               style: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(

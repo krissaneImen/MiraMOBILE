@@ -5,7 +5,7 @@ import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/MenuScreens/Photocopie.dart';
-import 'package:mira/Screens/acceuil.dart';
+import 'package:mira/Screens/MenuScreens/Services.dart';
 
 class PhotocopieWidget extends StatefulWidget {
   final UserModel userModel;
@@ -86,12 +86,13 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
     }
   }
 
-  void navigateToPhotocopiePage(String photocopieId) {
-    print('Photocopie ID: $photocopieId');
+  void navigateToPhotocopiePage(String photocopieId, String idDemande) {
+    print('Photocopie ID: $photocopieId , idDemande : $idDemande');
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => DetailsPhotocopieWidget(
           photocopieId: photocopieId,
+          idDemande: idDemande,
           userModel: widget.userModel,
         ),
       ),
@@ -121,7 +122,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
           ),
           onPressed: () {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Accueil(
+              builder: (context) => Services(
                 userModel: widget.userModel,
               ),
             ));
@@ -150,11 +151,12 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                     itemCount: photocopies.length,
                     itemBuilder: (context, index) {
                       if (index < photocopies.length) {
-                        var actualite = photocopies[index];
+                        var photocopie = photocopies[index];
                         String imageUrl = imageUrls[index % imageUrls.length];
                         return GestureDetector(
                           onTap: () {
-                            navigateToPhotocopiePage(photocopies[index]['id']);
+                            navigateToPhotocopiePage(photocopies[index]['id'],
+                                photocopies[index]['idDemande']);
                           },
                           child: Padding(
                             padding:
@@ -206,7 +208,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              actualite['cour'] ?? '',
+                                              photocopie['cour'] ?? '',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .headlineSmall
@@ -219,9 +221,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(0, 4, 8, 0),
                                               child: AutoSizeText(
-                                                photocopies[index]
-                                                        ['nombreCopie'] ??
-                                                    '',
+                                                'Nombre de photocopies: ${photocopies[index]['nombreCopie']}',
                                                 textAlign: TextAlign.start,
                                                 style:
                                                     FlutterFlowTheme.of(context)

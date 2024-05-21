@@ -1,27 +1,27 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/MenuScreens/photoCopies.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailsPhotocopieWidget extends StatelessWidget {
   final String photocopieId;
   final UserModel userModel;
-
+  final String idDemande;
   const DetailsPhotocopieWidget({
     Key? key,
     required this.photocopieId,
     required this.userModel,
+    required this.idDemande,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return _DetailsWidgetState(
       photocopieId: photocopieId,
+      idDemande: idDemande,
       userModel: userModel,
     );
   }
@@ -30,11 +30,13 @@ class DetailsPhotocopieWidget extends StatelessWidget {
 class _DetailsWidgetState extends StatefulWidget {
   final String photocopieId;
   final UserModel userModel;
+  final String idDemande;
 
   const _DetailsWidgetState({
     Key? key,
     required this.photocopieId,
     required this.userModel,
+    required this.idDemande,
   }) : super(key: key);
 
   @override
@@ -43,12 +45,14 @@ class _DetailsWidgetState extends StatefulWidget {
 
 class __DetailsWidgetStateState extends State<_DetailsWidgetState> {
   Map<String, dynamic> photocopiesDetails = {};
+  Map<String, dynamic> Etats = {};
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _fetchphotocopieDetails();
+    _fetchEtatData();
   }
 
   Future<void> _fetchphotocopieDetails() async {
@@ -94,41 +98,44 @@ class __DetailsWidgetStateState extends State<_DetailsWidgetState> {
     }
   }
 
-  Future<void> _downloadPdf(BuildContext context) async {
-    final url =
-        'http://localhost:8000/photocopie/download/${widget.photocopieId}';
+  Future<void> _fetchEtatData() async {
+    String apiUrl =
+        'http://localhost:8000/demande/get_demande_by_id/${widget.idDemande}';
     try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final documentsDirectory = await getApplicationDocumentsDirectory();
-        final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final pdfFile =
-            File('${documentsDirectory.path}/photocopie_$timestamp.pdf');
-        await pdfFile.writeAsBytes(response.bodyBytes);
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {'Accept-Charset': 'utf-8'},
+      );
 
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Téléchargement réussi'),
-              content: Text(
-                  'PDF téléchargé avec succès. Emplacement : ${pdfFile.path}'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Fermer la fenêtre modale
-                  },
-                  child: Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          Etats = data;
+          _isLoading = false;
+          print('Etats: $Etats'); // Print the whole Etats map
+
+          print('Etat récupéré: ${Etats['Etat']}'); // Add this line
+        });
       } else {
-        print('Erreur lors du téléchargement du PDF: ${response.statusCode}');
+        print('Failed to load the data: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erreur lors du téléchargement du PDF: $e');
+      print('Error loading the data: $e');
+    }
+  }
+
+  Color getStatusColor(String etat) {
+    switch (etat.toLowerCase()) {
+      case 'terminé':
+        return FlutterFlowTheme.of(context).secondary;
+      case 'rejeté':
+        return Colors.red;
+      case 'en cours':
+        return FlutterFlowTheme.of(context).primary;
+      case 'en attente':
+        return FlutterFlowTheme.of(context).tertiary;
+      default:
+        return Colors.black; // Par défaut, la couleur est noire
     }
   }
 
@@ -163,57 +170,73 @@ class __DetailsWidgetStateState extends State<_DetailsWidgetState> {
         centerTitle: false,
         elevation: 0,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxjb3BpZXJ8ZW58MHx8fHwxNzE1MDA3MTI5fDA&ixlib=rb-4.0.3&q=80&w=1080',
-                      width: double.infinity,
-                      height: 230,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Voir les détails de la demande ',
-                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                          fontFamily: 'Outfit',
-                          color: Color(0xFF4B39EF),
-                          fontSize: 18,
-                          letterSpacing: 0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                  // Generated code for this Divider Widget...
-                  Divider(
-                    height: 12,
-                    thickness: 1,
-                    color: FlutterFlowTheme.of(context).alternate,
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 8, 16, 12),
-                    child: ElevatedButton(
-                      onPressed: () => _openPdf(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FlutterFlowTheme.of(context).primary,
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+      body: SafeArea(
+        top: true,
+        child: _isLoading
+            ? CircularProgressIndicator() // Show loading indicator while fetching data
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Nom enseignant: ${photocopiesDetails['NomEnseignant']}',
+                        style:
+                            FlutterFlowTheme.of(context).headlineSmall.override(
+                                  fontFamily: 'Outfit',
+                                  letterSpacing: 0,
+                                ),
                       ),
+                    ),
+                    Divider(
+                      height: 12,
+                      thickness: 1,
+                      color: FlutterFlowTheme.of(context).alternate,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Matière: ${photocopiesDetails['cour']}',
+                        style:
+                            FlutterFlowTheme.of(context).headlineSmall.override(
+                                  fontFamily: 'Outfit',
+                                  letterSpacing: 0,
+                                ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Nombre de photocopies: ${photocopiesDetails['nombreCopie']}',
+                        style: FlutterFlowTheme.of(context).labelLarge.override(
+                              fontFamily: 'Readex Pro',
+                              letterSpacing: 0,
+                            ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(16),
                       child: Container(
                         width: double.infinity,
-                        alignment: Alignment.center,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 4,
+                              color: Color(0x33000000),
+                              offset: Offset(
+                                0,
+                                2,
+                              ),
+                            )
+                          ],
+                          color: getStatusColor(Etats['Etat'] ?? ''),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        alignment: AlignmentDirectional(0, 0),
                         child: Text(
-                          'Voir le PDF',
+                          '${Etats['Etat']}',
                           style:
                               FlutterFlowTheme.of(context).titleSmall.override(
                                     fontFamily: 'Readex Pro',
@@ -222,38 +245,49 @@ class __DetailsWidgetStateState extends State<_DetailsWidgetState> {
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
-                    child: ElevatedButton(
-                      onPressed: () => _downloadPdf(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FlutterFlowTheme.of(context).accent1,
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Télécharger le PDF',
-                          style:
-                              FlutterFlowTheme.of(context).bodyLarge.override(
+                    Padding(
+                        padding: EdgeInsets.all(16),
+                        child: GestureDetector(
+                          onTap: () {
+                            _openPdf(context);
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).accent1,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 4,
+                                  color: Color(0x33000000),
+                                  offset: Offset(
+                                    0,
+                                    2,
+                                  ),
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: FlutterFlowTheme.of(context).primary,
+                                width: 2,
+                              ),
+                            ),
+                            alignment: AlignmentDirectional(0, 0),
+                            child: Text(
+                              'Voir PDF',
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyLarge
+                                  .override(
                                     fontFamily: 'Readex Pro',
                                     color: FlutterFlowTheme.of(context).primary,
                                     letterSpacing: 0,
                                   ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
               ),
-            ),
-          ),
-        ],
       ),
     );
   }

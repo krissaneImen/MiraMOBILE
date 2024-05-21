@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
 import 'package:mira/Screens/MenuScreens/DemandeAttest.dart';
+import 'package:mira/Screens/MenuScreens/photoCopies.dart';
 import 'package:mira/Screens/acceuil.dart';
 
 class Services extends StatefulWidget {
@@ -158,61 +159,62 @@ class _ServicesState extends State<Services> {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AttestationWidget(userModel: widget.userModel),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 3,
-                          color: Color(0x33000000),
-                          offset: Offset(
-                            0,
-                            1,
-                          ),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Tous les demandes',
-                            style: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  letterSpacing: 0,
-                                ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            size: 24,
-                          ),
+              if (widget.userModel.statut == 'Etudiant')
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AttestationWidget(userModel: widget.userModel),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3,
+                            color: Color(0x33000000),
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          )
                         ],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tous les demandes',
+                              style: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 24,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
               if (widget.userModel.statut == 'Etudiant')
                 GestureDetector(
                   onTap: () {
@@ -367,7 +369,13 @@ class _ServicesState extends State<Services> {
                   widget.userModel.statut == 'Administratif')
                 GestureDetector(
                   onTap: () {
-                    // Logique pour Mes absences
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PhotocopieWidget(userModel: widget.userModel),
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),

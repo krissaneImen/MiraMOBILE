@@ -28,26 +28,27 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Image de fond
-
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo de l'application
                 Image.asset(
                   'assets/imen.png',
-                  width: 150,
-                  height: 150,
+                  width: screenWidth * 0.3, // Utilisation d'une taille relative
+                  height:
+                      screenHeight * 0.2, // Utilisation d'une taille relative
                 ),
-
-                SizedBox(height: 20),
-                // Barre de progression personnalisée
+                SizedBox(
+                    height: screenHeight *
+                        0.02), // Utilisation d'une taille relative
                 AnimatedOpacity(
                   duration: Duration(milliseconds: 1000),
                   opacity: _opacity,
@@ -57,28 +58,32 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-                // Titre de l'application
+                SizedBox(
+                    height: screenHeight *
+                        0.02), // Utilisation d'une taille relative
                 AnimatedOpacity(
                   duration: Duration(milliseconds: 1000),
                   opacity: _opacity,
                   child: Text(
                     'Iset Tataouine',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: screenWidth *
+                          0.06, // Utilisation d'une taille relative
                       fontWeight: FontWeight.bold,
                       color: Color.fromARGB(255, 121, 121, 121),
                       fontFamily: 'Readex Pro',
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-                // Texte "By Mira"
+                SizedBox(
+                    height: screenHeight *
+                        0.02), // Utilisation d'une taille relative
                 Text(
                   'Mira',
                   style: GoogleFonts.dancingScript(
                     textStyle: TextStyle(
-                      fontSize: 24,
+                      fontSize: screenWidth *
+                          0.04, // Utilisation d'une taille relative
                       color: Colors.black54,
                       fontStyle: FontStyle.italic,
                     ),

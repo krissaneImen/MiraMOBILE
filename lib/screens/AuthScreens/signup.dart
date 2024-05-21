@@ -170,7 +170,6 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                                 labelText: 'Nom *',
                                 autofillHints: [AutofillHints.name],
                                 keyboardType: TextInputType.name,
-                                
                               ),
                             ),
                             Padding(

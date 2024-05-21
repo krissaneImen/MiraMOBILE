@@ -1,32 +1,43 @@
 import 'dart:convert';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
-import 'package:mira/Provider/user_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:mira/Screens/MenuScreens/Photocopie.dart';
-import 'package:mira/Screens/acceuil.dart';
+import 'package:mira/Provider/user_model.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:mira/Utils/CustomAlertDialog.dart';
 
 class JournalDetails extends StatefulWidget {
-  final UserModel userModel;
   final String journalId;
-  const JournalDetails(
-      {Key? key, required this.userModel, required this.journalId})
-      : super(key: key);
+  final UserModel userModel;
+  final Map<String, dynamic> journalData;
+
+  const JournalDetails({
+    Key? key,
+    required this.userModel,
+    required this.journalId,
+    required this.journalData,
+  }) : super(key: key);
 
   @override
-  State<JournalDetails> createState() => _JournalDetailsState();
+  _JournalDetailsState createState() => _JournalDetailsState();
 }
 
 class _JournalDetailsState extends State<JournalDetails> {
-  Map<String, dynamic> JournalDetails = {};
+  Map<String, dynamic> JournauxDetails = {};
   bool _isLoading = true;
-  Future<void> _fetchJournalDetails() async {
-    // Afficher l'ID de la formation récupéré dans la console
-    print('Formation ID: ${widget.journalId}');
+  String? lastUpdate;
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchTachesDetails();
+    _fetchEvaluationsDetails();
+  }
+
+  Future<void> _fetchTachesDetails() async {
+    print('Tache ID: ${widget.journalId}');
     String apiUrl =
-        'http://192.168.1.21:8000/formation/getFormation/${widget.journalId}';
+        'http://localhost:8000/tache/get_all_tache/${widget.journalId}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -36,16 +47,68 @@ class _JournalDetailsState extends State<JournalDetails> {
       );
 
       if (response.statusCode == 200) {
-        var data = json.decode(utf8.decode(response.bodyBytes));
-        setState(() {
-          JournalDetails = data;
-          _isLoading = false;
-        });
+        var responseData = json.decode(utf8.decode(response.bodyBytes));
+        if (responseData is List && responseData.isNotEmpty) {
+          setState(() {
+            JournauxDetails = responseData[0];
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Aucune tâche ajoutée"),
+                content:
+                    Text("Il n'y a pas de tâches ajoutées pour le moment."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       } else {
-        print('Failed to load formation details: ${response.statusCode}');
+        print('Failed to load details: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading formation details: $e');
+      print('Error loading details: $e');
+    }
+  }
+
+  Future<void> _fetchEvaluationsDetails() async {
+    print('Evaluation ID: ${widget.journalId}');
+    String apiUrl =
+        'http://localhost:8000/stageEvaluation/get_all_Evaluations/${widget.userModel.cin}/${widget.journalId}';
+    try {
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept-Charset': 'utf-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var responseData = json.decode(utf8.decode(response.bodyBytes));
+        // Update the lastUpdate variable with the details of the latest update
+        if (responseData is List && responseData.isNotEmpty) {
+          setState(() {
+            lastUpdate = responseData[0]['LastModified'];
+          });
+        }
+      } else {
+        print('Failed to load details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading details: $e');
     }
   }
 
@@ -53,423 +116,378 @@ class _JournalDetailsState extends State<JournalDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Détails',
-          style: FlutterFlowTheme.of(context).titleLarge,
-        ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         automaticallyImplyLeading: false,
-        leading: FlutterFlowIconButton(
-          borderColor: Colors.transparent,
-          borderRadius: 30,
-          borderWidth: 1,
-          buttonSize: 60,
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: FlutterFlowTheme.of(context).primaryText,
-            size: 30,
-          ),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Accueil(
-                userModel: widget.userModel,
-              ),
-            ));
+        leading: InkWell(
+          splashColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () async {
+            Navigator.of(context).pop();
           },
+          child: Icon(
+            Icons.chevron_left_rounded,
+            color: FlutterFlowTheme.of(context).primaryText,
+            size: 32,
+          ),
         ),
+        title: Text(
+          'Détails du journal ',
+          style: FlutterFlowTheme.of(context).headlineMedium.override(
+                fontFamily: 'Outfit',
+                letterSpacing: 0,
+              ),
+        ),
+        actions: [],
         centerTitle: false,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (responsiveVisibility(
-              context: context,
-              phone: false,
-              tablet: false,
-            ))
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(16, 12, 0, 12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 2, 0, 2),
-                        child: FlutterFlowIconButton(
-                          borderColor: Colors.transparent,
-                          borderRadius: 30,
-                          borderWidth: 1,
-                          buttonSize: 40,
-                          icon: Icon(
-                            Icons.home_rounded,
-                            color: FlutterFlowTheme.of(context).secondaryText,
-                            size: 22,
-                          ),
-                          onPressed: () {
-                            print('IconButton pressed ...');
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 0),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                          size: 16,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 8, 16, 8),
-                        child: Container(
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).accent1,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: AlignmentDirectional(0, 0),
-                          child: Padding(
-                            padding:
-                                EdgeInsetsDirectional.fromSTEB(12, 4, 12, 4),
-                            child: Text(
-                              'Order Details',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    color: FlutterFlowTheme.of(context).primary,
-                                    letterSpacing: 0,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(16, 0, 0, 0),
-              child: Text(
-                'Order #49224222',
-                style: FlutterFlowTheme.of(context).headlineSmall.override(
-                      fontFamily: 'Outfit',
-                      letterSpacing: 0,
-                    ),
-              ),
-            ),
-            // Generated code for this Row Widget...
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 8,
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 16, 0, 16),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'TXN123456789',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
+                        Row(mainAxisSize: MainAxisSize.max, children: [
+                          Text(
+                            widget.journalData['Nom'] ?? '',
+                            style:
+                                FlutterFlowTheme.of(context).bodyLarge.override(
                                       fontFamily: 'Readex Pro',
                                       letterSpacing: 0,
                                     ),
-                              ),
-                            ],
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 16),
-                          child: Divider(
-                            thickness: 2,
-                            color: FlutterFlowTheme.of(context).alternate,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '\$480.00',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
+                          Text(
+                            '   ${widget.journalData['Prenom'] ?? ''}',
+                            style:
+                                FlutterFlowTheme.of(context).bodyLarge.override(
                                       fontFamily: 'Readex Pro',
                                       letterSpacing: 0,
                                     ),
-                              ),
-                            ],
                           ),
+                        ]),
+                        Row(mainAxisSize: MainAxisSize.max, children: [
+                          Text(
+                            widget.journalData['NatureStage'] ?? '',
+                            style: FlutterFlowTheme.of(context)
+                                .titleMedium
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  letterSpacing: 0,
+                                ),
+                          ),
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
+                            child: Text(
+                              widget.journalData['Entreprise'],
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    color:
+                                        FlutterFlowTheme.of(context).secondary,
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                          ),
+                          Text(
+                            widget.journalData[''] ?? '',
+                            style: FlutterFlowTheme.of(context)
+                                .headlineMedium
+                                .override(
+                                  fontFamily: 'Outfit',
+                                  letterSpacing: 0,
+                                ),
+                          ),
+                        ]),
+                        Text(
+                          'Période de stage ${widget.journalData['PeriodeStage'] ?? ''}',
+                          style:
+                              FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0,
+                                  ),
                         ),
                         Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [],
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
+                          child: Text(
+                            lastUpdate ?? '',
+                            style: FlutterFlowTheme.of(context)
+                                .titleMedium
+                                .override(
+                                  fontFamily: 'Readex Pro',
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  letterSpacing: 0,
+                                ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 16),
-                          child: Divider(
-                            thickness: 2,
-                            color: FlutterFlowTheme.of(context).alternate,
-                          ),
+                        Divider(
+                          height: 32,
+                          thickness: 1,
+                          color: FlutterFlowTheme.of(context).alternate,
                         ),
                       ],
                     ),
                   ),
-                ),
-                // Create this as a component if you want to use it best.
-                if (responsiveVisibility(
-                  context: context,
-                  phone: false,
-                  tablet: false,
-                ))
-                  Flexible(
-                    flex: 5,
-                    child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(16, 16, 16, 0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (!_isLoading && JournauxDetails.isEmpty)
                           Padding(
                             padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 4, 0, 12),
+                                EdgeInsetsDirectional.fromSTEB(16, 12, 0, 4),
                             child: Text(
-                              'Customer Details',
+                              'Aucune tâche ajoutée',
                               style: FlutterFlowTheme.of(context)
-                                  .labelMedium
+                                  .headlineMedium
+                                  .override(
+                                    fontFamily: 'Outfit',
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                          ),
+                        if (!_isLoading && JournauxDetails.isEmpty)
+                          Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(16, 4, 0, 0),
+                            child: Text(
+                              "Il n'y a pas de tâches ajoutées pour le moment.",
+                              style: FlutterFlowTheme.of(context)
+                                  .bodyMedium
                                   .override(
                                     fontFamily: 'Readex Pro',
                                     letterSpacing: 0,
                                   ),
                             ),
                           ),
+                        if (!_isLoading && JournauxDetails.isEmpty)
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children: [
+                                // Vous pouvez ajouter d'autres widgets ou du contenu ici selon vos besoins
+                              ],
+                            ),
+                          ),
+                        if (!_isLoading && JournauxDetails.isNotEmpty)
                           Padding(
                             padding:
-                                EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .secondaryBackground,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: FlutterFlowTheme.of(context).alternate,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Padding(
-                                padding:
-                                    EdgeInsetsDirectional.fromSTEB(0, 0, 0, 12),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(12),
+                                EdgeInsetsDirectional.fromSTEB(16, 12, 0, 4),
+                            child: Text(
+                              'Taches',
+                              style: FlutterFlowTheme.of(context)
+                                  .headlineMedium
+                                  .override(
+                                    fontFamily: 'Outfit',
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                          ),
+                        if (!_isLoading && JournauxDetails.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0, 0, 0, 1),
+                                  child: Container(
+                                    width: 100,
+                                    height: 120,
+                                    decoration: BoxDecoration(
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          blurRadius: 0,
+                                          color: Color(0xFFE0E3E7),
+                                          offset: Offset(
+                                            0,
+                                            1,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0, 0, 0, 2),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
-                                          Container(
-                                            width: 44,
-                                            height: 44,
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryBackground,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .alternate,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(2),
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  'https://source.unsplash.com/random/1280x720?profile&5',
-                                                  width: 44,
-                                                  height: 44,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                           Padding(
                                             padding:
                                                 EdgeInsetsDirectional.fromSTEB(
-                                                    12, 0, 0, 0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Haily Brown',
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyLarge
-                                                      .override(
-                                                        fontFamily:
-                                                            'Readex Pro',
-                                                        letterSpacing: 0,
-                                                      ),
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(0, 4, 0, 0),
-                                                  child: Text(
-                                                    '@brownisthenewblack',
+                                                    16, 8, 0, 8),
+                                            child: Container(
+                                              width: 4,
+                                              height: 100,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(12, 12, 12, 0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    JournauxDetails[
+                                                            'TacheJournaliere'] ??
+                                                        '',
                                                     style: FlutterFlowTheme.of(
                                                             context)
-                                                        .labelSmall
+                                                        .bodyMedium
                                                         .override(
                                                           fontFamily:
                                                               'Readex Pro',
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primary,
                                                           letterSpacing: 0,
                                                         ),
                                                   ),
-                                                ),
-                                              ],
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                                0, 8, 0, 0),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(0,
+                                                                      0, 4, 0),
+                                                          child: Text(
+                                                            'Ajoutée le:',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodySmall
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  letterSpacing:
+                                                                      0,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            JournauxDetails[
+                                                                    'Date'] ??
+                                                                '',
+                                                            style: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  fontFamily:
+                                                                      'Readex Pro',
+                                                                  letterSpacing:
+                                                                      0,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(0,
+                                                                      0, 8, 0),
+                                                          child:
+                                                              GestureDetector(
+                                                            child: badges.Badge(
+                                                              badgeContent:
+                                                                  Text(
+                                                                '!',
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                      fontFamily:
+                                                                          'Readex Pro',
+                                                                      color: Colors
+                                                                          .white,
+                                                                      letterSpacing:
+                                                                          0,
+                                                                    ),
+                                                              ),
+                                                              showBadge: true,
+                                                              position: badges
+                                                                      .BadgePosition
+                                                                  .topStart(),
+                                                              child: Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            16,
+                                                                            4,
+                                                                            0,
+                                                                            0),
+                                                                child: Text(
+                                                                  'Dernière modification: ${JournauxDetails['LastModified'] ?? ''}',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily:
+                                                                            'Readex Pro',
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        letterSpacing:
+                                                                            0,
+                                                                      ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16, 0, 0, 0),
-                                      child: Text(
-                                        'Address',
-                                        style: FlutterFlowTheme.of(context)
-                                            .labelSmall
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              letterSpacing: 0,
-                                            ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16, 8, 0, 0),
-                                      child: Text(
-                                        '123 West Hollywood Blvd. San Mateo, CA. 90294',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              fontFamily: 'Readex Pro',
-                                              letterSpacing: 0,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional(0, 0),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
-                              child: FFButtonWidget(
-                                onPressed: () {
-                                  print('Button pressed ...');
-                                },
-                                text: 'Message Customer',
-                                options: FFButtonOptions(
-                                  width: double.infinity,
-                                  height: 48,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        letterSpacing: 0,
-                                      ),
-                                  elevation: 3,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional(0, 0),
-                            child: Padding(
-                              padding:
-                                  EdgeInsetsDirectional.fromSTEB(0, 12, 0, 0),
-                              child: FFButtonWidget(
-                                onPressed: () {
-                                  print('Button pressed ...');
-                                },
-                                text: 'Report Now',
-                                options: FFButtonOptions(
-                                  width: double.infinity,
-                                  height: 48,
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                      0, 0, 0, 0),
-                                  color: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
-                                  textStyle: FlutterFlowTheme.of(context)
-                                      .bodyLarge
-                                      .override(
-                                        fontFamily: 'Readex Pro',
-                                        letterSpacing: 0,
-                                      ),
-                                  elevation: 0,
-                                  borderSide: BorderSide(
-                                    color:
-                                        FlutterFlowTheme.of(context).alternate,
-                                    width: 2,
                                   ),
-                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
-              ].divide(SizedBox(width: 16)),
-            )
-          ],
-        ),
-      ),
+                ],
+              ),
+            ),
     );
   }
 }
