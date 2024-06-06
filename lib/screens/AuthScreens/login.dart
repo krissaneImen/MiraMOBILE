@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
@@ -17,6 +19,8 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
   late UserModel _model;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final animationsMap = AnimationHelper.animationsMap;
+  List<dynamic> donnees = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -28,12 +32,59 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
         ),
       );
     });
+    fetchInstitutData();
+  }
+
+  Future<void> fetchInstitutData() async {
+    String apiUrl = 'http://192.168.1.20:8000/client/get_Institut/';
+    try {
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept-Charset': 'utf-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          donnees = data;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load the data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading the data: $e');
+    }
   }
 
   @override
   void dispose() {
     _model.dispose();
     super.dispose();
+  }
+
+  Widget _buildLogoImage() {
+    try {
+      if (donnees.isNotEmpty && donnees[0].containsKey('logo')) {
+        // Essayer de charger l'image depuis les données
+        return Image.memory(
+          base64.decode(donnees[0]['logo']),
+          width: 200,
+          height: 70,
+        );
+      }
+    } catch (e) {
+      print('Failed to load image: $e');
+    }
+
+    // En cas d'erreur ou de données manquantes, retourner l'image par défaut
+    return Image.asset(
+      'assets/Instituts.jpeg',
+      width: 200,
+      height: 70,
+    );
   }
 
   @override
@@ -83,10 +134,7 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         alignment: AlignmentDirectional(0, 0),
-                        child: Image.asset(
-                          'assets/isetlogo.png',
-                          fit: BoxFit.contain,
-                        ),
+                        child: _buildLogoImage(),
                       ),
                     ),
                     Padding(
@@ -259,9 +307,10 @@ class _LoginPage extends State<LoginPage> with TickerProviderStateMixin {
                                           child: GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          SignupPage()));
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SignupPage()),
+                                              );
                                             },
                                             child: Text(
                                               'S\'inscrire ',

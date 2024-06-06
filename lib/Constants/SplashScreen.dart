@@ -61,23 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 SizedBox(
                     height: screenHeight *
                         0.02), // Utilisation d'une taille relative
-                AnimatedOpacity(
-                  duration: Duration(milliseconds: 1000),
-                  opacity: _opacity,
-                  child: Text(
-                    'Iset Tataouine',
-                    style: TextStyle(
-                      fontSize: screenWidth *
-                          0.06, // Utilisation d'une taille relative
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 121, 121, 121),
-                      fontFamily: 'Readex Pro',
-                    ),
-                  ),
-                ),
-                SizedBox(
-                    height: screenHeight *
-                        0.02), // Utilisation d'une taille relative
+
                 Text(
                   'Mira',
                   style: GoogleFonts.dancingScript(

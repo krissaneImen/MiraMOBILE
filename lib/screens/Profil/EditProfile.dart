@@ -108,7 +108,8 @@ class _EditprofilWidgetState extends State<Editprofil> {
   }
 
   Future<void> _fetchProfileData() async {
-    String apiUrl = 'http://localhost:8000/profil/profiles/cin/${widget.cin}';
+    String apiUrl =
+        'http://172.16.26.109:8000/profil/profiles/cin/${widget.cin}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),

@@ -33,7 +33,7 @@ class _ManifestationDetailsState extends State<Manifestation> {
     print('manifestation ID: ${widget.manifestationId}');
 
     String apiUrl =
-        'http://192.168.1.21:8000/manifestation/getManifestation/${widget.manifestationId}';
+        'http://172.16.26.109:8000/manifestation/getManifestation/${widget.manifestationId}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -107,77 +107,146 @@ class _ManifestationDetailsState extends State<Manifestation> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    padding: EdgeInsets.all(16),
+                    child: Table(
+                      columnWidths: {
+                        0: FixedColumnWidth(150.0),
+                        1: FlexColumnWidth(),
+                      },
+                      border: TableBorder.all(color: Colors.black),
                       children: [
-                        Text(
-                          ManifestationDetails['intitule'] ?? '',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineMedium
-                              .override(
-                                fontFamily: 'Outfit',
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Intitulé',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
                               ),
-                        ),
-                        Text(
-                          ManifestationDetails['formateurs'] ?? '',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineMedium
-                              .override(
-                                fontFamily: 'Outfit',
-                                letterSpacing: 0,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['intitule'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
                               ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          ManifestationDetails['dateDebut'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Formateurs',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['formateurs'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          ManifestationDetails['dateFin'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Date Début',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['dateDebut'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-                          child: Text(
-                            ManifestationDetails['lieuManifestation'] ?? '',
-                            style: FlutterFlowTheme.of(context)
-                                .titleMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  letterSpacing: 0,
-                                ),
-                          ),
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Date Fin',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['dateFin'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          ManifestationDetails['responsables'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Lieu',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['lieuManifestation'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          ManifestationDetails['description'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Responsables',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['responsables'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
-                        Divider(
-                          height: 32,
-                          thickness: 1,
-                          color: FlutterFlowTheme.of(context).alternate,
+                        TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Description',
+                                style:
+                                    FlutterFlowTheme.of(context).headlineMedium,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ManifestationDetails['description'] ?? '',
+                                style: FlutterFlowTheme.of(context).labelLarge,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

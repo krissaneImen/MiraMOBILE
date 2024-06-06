@@ -1,18 +1,25 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/Actualit%C3%A9%20et%20docuements%20admin/CalendrierUniversitaire.dart';
+import 'package:mira/Provider/user_model.dart';
+import 'package:mira/Screens/Absences.dart';
 import 'package:mira/Screens/MenuScreens/Actualit%C3%A9%20et%20docuements%20admin/Calendriers.dart';
 import 'package:mira/Screens/MenuScreens/ActualityPage.dart';
 import 'package:mira/Screens/MenuScreens/Cours.dart';
+import 'package:mira/Screens/MenuScreens/Manifestations.dart';
 import 'package:mira/Screens/MenuScreens/Reglements/TypesReglements.dart';
 import 'package:mira/Screens/MenuScreens/Services.dart';
 import 'package:mira/Screens/MenuScreens/Stages/Stages.dart';
 import 'package:mira/Screens/MenuScreens/formations.dart';
-import 'package:mira/Screens/Profil.dart';
+import 'package:mira/Screens/Profil/Profil.dart';
 import 'package:mira/Screens/acceuil.dart';
+import 'package:http/http.dart' as http;
+import 'package:mira/Utils/CustomAlertDialog.dart';
 
 class UserDrawer extends StatefulWidget {
   final UserModel userModel; // Ajoutez une instance de UserModel comme argument
@@ -26,11 +33,71 @@ class UserDrawer extends StatefulWidget {
 
 class _UserDrawerState extends State<UserDrawer> {
   bool _isDrawerOpen = false;
+  List<dynamic> donnees = [];
+  List<dynamic> adresses = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+
     widget.userModel.getProfileImage();
+    fetchInstitutData();
+  }
+
+  Future<bool> _checkIpAddressAllowed(String publicIpAddress) async {
+    try {
+      // Appel de l'API pour comparer l'adresse IP avec les plages autorisées
+      var response = await http.get(
+        Uri.parse(
+            'http://192.168.1.20:8000/abscence/check_ip_allowed/$publicIpAddress'),
+      );
+
+      if (response.statusCode == 200) {
+        // Traitement de la réponse JSON de l'API
+        var responseData = jsonDecode(response.body);
+        bool isAllowed = responseData['allowed'];
+        // Utilisez la valeur de retour isAllowed pour décider de l'action à effectuer
+        if (isAllowed) {
+          print('L\'adresse IP est autorisée');
+        } else {
+          print('L\'adresse IP n\'est pas autorisée');
+        }
+        return isAllowed;
+      } else {
+        // Gestion des erreurs de l'appel API
+        print('Failed to check IP address: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      // Gestion des erreurs d'exception
+      print('Exception while checking IP address: $e');
+      return false;
+    }
+  }
+
+  Future<void> fetchInstitutData() async {
+    String apiUrl = 'http://192.168.1.20:8000/client/get_Institut/';
+    try {
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept-Charset': 'utf-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          donnees = data;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load the data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading the data: $e');
+    }
   }
 
   @override
@@ -142,6 +209,53 @@ class _UserDrawerState extends State<UserDrawer> {
                   );
                 },
               ),
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
+                _buildMenuOption(
+                  icon: Icons.note_alt_outlined,
+                  text: 'Absences',
+                  onTap: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SeancesWidget(
+                          userModel: widget.userModel,
+                        ),
+                      ),
+                    );
+                    // Appel de la méthode pour obtenir l'adresse IP de l'utilisateur
+                    // Vérification de l'autorisation avec l'adresse IP récupérée
+                    // bool isAllowed = await _checkIpAddressAllowed(
+                    //     widget.userModel.publicIpAddress);
+                    // // Si l'adresse IP est autorisée, naviguer vers la page des Absences
+                    // if (isAllowed) {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => SeancesWidget(
+                    //         userModel: widget.userModel,
+                    //       ),
+                    //     ),
+                    //   );
+                    // } else {
+                    //   // Sinon, afficher un message indiquant que l'accès est refusé
+                    //   showDialog(
+                    //     context: context,
+                    //     builder: (BuildContext context) {
+                    //       return CustomAlertDialog(
+                    //         title: 'Accès refusé',
+                    //         content:
+                    //             'Votre adresse IP n\'est pas autorisée à accéder à cette section.',
+                    //         onPressed: () {
+                    //           Navigator.of(context).pop();
+                    //         },
+                    //       );
+                    //     },
+                    //   );
+                    // }
+                  },
+                ),
+
               _buildMenuOption(
                 icon: Icons.school,
                 text: 'Formations',
@@ -150,6 +264,20 @@ class _UserDrawerState extends State<UserDrawer> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => FormationList(
+                        userModel: widget.userModel,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _buildMenuOption(
+                icon: Icons.diversity_3,
+                text: 'Manifestations',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManifestationsWidget(
                         userModel: widget.userModel,
                       ),
                     ),
@@ -243,7 +371,7 @@ class _UserDrawerState extends State<UserDrawer> {
           Padding(
             padding: EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
             child: Text(
-              'Iset Tataouine',
+              donnees.isNotEmpty ? donnees[0]['acronyme'] ?? '' : '',
               style: FlutterFlowTheme.of(context).headlineMedium.override(
                     fontFamily: 'Outfit',
                     letterSpacing: 0,

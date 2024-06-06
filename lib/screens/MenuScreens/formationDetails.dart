@@ -33,7 +33,7 @@ class _FormationsDetailsState extends State<FormationsDetails> {
     print('Formation ID: ${widget.formationId}');
 
     String apiUrl =
-        'http://localhost:8000/formation/getFormation/${widget.formationId}';
+        'http://172.16.26.109:8000/formation/getFormation/${widget.formationId}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -71,13 +71,13 @@ class _FormationsDetailsState extends State<FormationsDetails> {
             Navigator.of(context).pop();
           },
           child: Icon(
-            Icons.chevron_left_rounded,
+            Icons.arrow_back_rounded,
             color: FlutterFlowTheme.of(context).primaryText,
-            size: 32,
+            size: 30,
           ),
         ),
         title: Text(
-          'Détails de formations ',
+          'Détails de formation ',
           style: FlutterFlowTheme.of(context).headlineMedium.override(
                 fontFamily: 'Outfit',
                 letterSpacing: 0,
@@ -90,101 +90,75 @@ class _FormationsDetailsState extends State<FormationsDetails> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(16),
-                    child: ClipRRect(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.memory(
                         base64Decode(formationsDetails['poster']),
                         width: double.infinity,
-                        height: 200, // Définir une hauteur fixe pour l'image
+                        height: 200,
                         fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    SizedBox(height: 16),
+                    Table(
+                      columnWidths: {
+                        0: FixedColumnWidth(150),
+                        1: FlexColumnWidth(),
+                      },
+                      border: TableBorder.all(color: Colors.grey),
                       children: [
-                        Text(
-                          formationsDetails['intitule'] ?? '',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineMedium
-                              .override(
-                                fontFamily: 'Outfit',
-                              ),
-                        ),
-                        Text(
-                          formationsDetails['formateur'] ?? '',
-                          style: FlutterFlowTheme.of(context)
-                              .headlineMedium
-                              .override(
-                                fontFamily: 'Outfit',
-                                letterSpacing: 0,
-                              ),
-                        ),
-                        Text(
-                          'Responsable du formation: ${formationsDetails['responsable'] ?? 'Inconnu'}',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                        ),
-                        Text(
-                          'Numéro de responsable: ${formationsDetails['phoneNumber'] ?? 'Inconnu'}',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                        ),
-                        Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 8, 0, 8),
-                          child: Text(
-                            formationsDetails['dateDeFormation'] ?? '',
-                            style: FlutterFlowTheme.of(context)
-                                .titleMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  color: FlutterFlowTheme.of(context).primary,
-                                  letterSpacing: 0,
-                                ),
-                          ),
-                        ),
-                        Text(
-                          formationsDetails['lieuFormation'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                        ),
-                        Text(
-                          formationsDetails['description'] ?? '',
-                          style:
-                              FlutterFlowTheme.of(context).labelLarge.override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                        ),
-                        Divider(
-                          height: 32,
-                          thickness: 1,
-                          color: FlutterFlowTheme.of(context).alternate,
-                        ),
+                        _buildTableRow(
+                            'Intitulé', formationsDetails['intitule']),
+                        _buildTableRow(
+                            'Formateur', formationsDetails['formateur']),
+                        _buildTableRow(
+                            'Responsable', formationsDetails['responsable']),
+                        _buildTableRow('Numéro de responsable',
+                            formationsDetails['phoneNumber']),
+                        _buildTableRow('Date de formation',
+                            formationsDetails['dateDeFormation']),
+                        _buildTableRow('Lieu de formation',
+                            formationsDetails['lieuFormation']),
+                        _buildTableRow(
+                            'Description', formationsDetails['description']),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+    );
+  }
+
+  TableRow _buildTableRow(String label, String? value) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            label,
+            style: FlutterFlowTheme.of(context).labelLarge.override(
+                  fontFamily: 'Readex Pro',
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            value ?? 'Inconnu',
+            style: FlutterFlowTheme.of(context).labelLarge.override(
+                  fontFamily: 'Readex Pro',
+                ),
+          ),
+        ),
+      ],
     );
   }
 }

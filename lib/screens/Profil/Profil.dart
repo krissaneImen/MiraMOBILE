@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
-import 'package:mira/Screens/EditProfile.dart';
-import 'package:mira/AboutUs.dart';
-import 'package:mira/TermsOfServicePage.dart';
+import 'package:mira/Constants/AboutUs.dart';
+import 'package:mira/Constants/TermsOfServicePage.dart';
+import 'package:mira/Screens/Profil/EditProfile.dart';
 
 class Profile extends StatefulWidget {
   const Profile({
@@ -37,7 +37,8 @@ class _ProfileWidgetState extends State<Profile> {
   }
 
   Future<void> _getProfileImage() async {
-    String apiUrl = 'http://localhost:8000/profil/profiles/cin/${widget.cin}';
+    String apiUrl =
+        'http://172.16.26.109:8000/profil/profiles/cin/${widget.cin}';
 
     try {
       var response = await http.get(Uri.parse(apiUrl));

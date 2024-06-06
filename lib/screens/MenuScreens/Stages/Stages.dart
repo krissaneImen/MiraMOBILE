@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/Journals.dart';
+import 'package:mira/Screens/ServicesDeStage/Journals.dart';
+import 'package:mira/Screens/MenuScreens/Stages/Soutenances.dart';
 import 'package:mira/Screens/MenuScreens/photoCopies.dart';
+import 'package:mira/Screens/ServicesDeStage/RapportList.dart';
 import 'package:mira/Screens/acceuil.dart';
-import 'package:mira/Screens/aporoposstage.dart';
+import 'package:mira/Screens/ServicesDeStage/Aporoposstage.dart';
 
 class Stages extends StatefulWidget {
   final UserModel userModel;
@@ -187,6 +189,17 @@ class _StagesState extends State<Stages> {
                     focusColor: Colors.transparent,
                     hoverColor: Colors.transparent,
                     highlightColor: Colors.transparent,
+                    onTap: () {
+                      // Navigation vers la page StudentJournals lorsque le bouton "Journaux de stages" est cliqué
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RapportList(
+                            userModel: widget.userModel,
+                          ),
+                        ),
+                      );
+                    },
                     child: Container(
                       width: double.infinity,
                       height: 50,
@@ -292,68 +305,68 @@ class _StagesState extends State<Stages> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
-                  child: InkWell(
-                    splashColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () {
-                      // Navigation vers la page StudentJournals lorsque le bouton "Journaux de stages" est cliqué
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StudentJournals(
-                            cin: widget.userModel.cin,
-                            userModel: widget.userModel,
+                if (widget.userModel.statut.toLowerCase() == 'administratif')
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      focusColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onTap: () {
+                        // Navigation vers la page StudentJournals lorsque le bouton "Journaux de stages" est cliqué
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SoutenanceList(
+                              userModel: widget.userModel,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3,
-                            color: Color(0x33000000),
-                            offset: Offset(
-                              0,
-                              1,
-                            ),
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Soutenances de stages',
-                              style: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24,
-                            ),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 3,
+                              color: Color(0x33000000),
+                              offset: Offset(
+                                0,
+                                1,
+                              ),
+                            )
                           ],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Soutenances de stages',
+                                style: FlutterFlowTheme.of(context)
+                                    .labelMedium
+                                    .override(
+                                      fontFamily: 'Readex Pro',
+                                      letterSpacing: 0,
+                                    ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                color: FlutterFlowTheme.of(context).primaryText,
+                                size: 24,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

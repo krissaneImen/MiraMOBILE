@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/Actualit%C3%A9%20et%20docuements%20admin/CalendrierUniversitaire.dart';
 import 'package:mira/Screens/acceuil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CalendriersWidget extends StatefulWidget {
   final UserModel userModel;
@@ -44,6 +44,21 @@ class _CalenriersWidgetState extends State<CalendriersWidget> {
     super.dispose();
   }
 
+  Future<void> _openPdf(String calendrierId) async {
+    final url = 'http://localhost:8000/calendrier/open_pdf/$calendrierId';
+
+    try {
+      // Ouvrir le PDF dans une visionneuse PDF externe
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Impossible de lancer $url';
+      }
+    } catch (e) {
+      print('Erreur lors de l\'ouverture du PDF: $e');
+    }
+  }
+
   Future<void> _fetchCalendrierData() async {
     String apiUrl = 'http://localhost:8000/calendrier/get_Calandrier_list/';
     try {
@@ -66,17 +81,6 @@ class _CalenriersWidgetState extends State<CalendriersWidget> {
     } catch (e) {
       print('Error loading the data: $e');
     }
-  }
-
-  void navigateToCalendPage(String calendrierId) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => Calendrier(
-          calendrierId: calendrierId,
-          userModel: widget.userModel,
-        ),
-      ),
-    );
   }
 
   @override
@@ -134,9 +138,6 @@ class _CalenriersWidgetState extends State<CalendriersWidget> {
                       var randomImageUrl =
                           imageUrls[Random().nextInt(imageUrls.length)];
                       return GestureDetector(
-                        onTap: () {
-                          navigateToCalendPage(calendrier['id']);
-                        },
                         child: Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 0),
                           child: Container(
@@ -262,35 +263,42 @@ class _CalenriersWidgetState extends State<CalendriersWidget> {
                                     ),
                                   ),
                                   Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0, 4, 0, 8),
-                                          child: RichText(
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text:
-                                                      calendrier['semestre'] ??
-                                                          '',
-                                                  style: TextStyle(
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primary,
-                                                    fontFamily: 'Readex Pro',
-                                                    letterSpacing: 0,
-                                                  ),
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0, 4, 0, 8),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(
+                                                text: calendrier['semestre'] ??
+                                                    '',
+                                                style: TextStyle(
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .primary,
+                                                  fontFamily: 'Readex Pro',
+                                                  letterSpacing: 0,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        SizedBox(width: 25),
-                                      ]),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.picture_as_pdf),
+                                        color: FlutterFlowTheme.of(context)
+                                            .primary,
+                                        onPressed: () {
+                                          _openPdf(calendrier['id']
+                                              .toString()); // Assurez-vous que l'ID est une chaîne
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),

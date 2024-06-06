@@ -40,10 +40,10 @@ class _ActualiteWidgetState extends State<ActualiteWidget> {
   }
 
   Future<void> _fetchActulityData() async {
-    String statut = widget.userModel.statut;
+    String statut = widget.userModel.statut.toLowerCase();
 
     String apiUrl =
-        'http://localhost:8000/actualite/get_all_actualite/${statut}';
+        'http://172.16.26.109:8000/actualite/get_all_actualite/${statut}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),

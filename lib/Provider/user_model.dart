@@ -30,7 +30,8 @@ class UserModel extends ChangeNotifier {
   late Function(String) _showSnackBar;
   late String _photoBase64;
   late String titre;
-
+  late String publicIpAddress;
+  late String privateIpAddress;
   UserModel(this._showSnackBar) {
     passwordVisibility = false;
     _firstNameController = TextEditingController();
@@ -60,11 +61,30 @@ class UserModel extends ChangeNotifier {
   TextEditingController get passwordController => _passwordController;
   TextEditingController get resetPasswordController => _resetPasswordController;
   String? getPhotoBase64() => _photoBase64;
+  Future<void> getUserIpAddress() async {
+    try {
+      var response = await http
+          .get(Uri.parse('http://192.168.1.20:8000/abscence/my_IpAdress/'));
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        privateIpAddress = data['private_ip_address'];
+        publicIpAddress = data['ip_address'];
+        print('Adresse IP privée : $privateIpAddress');
+        print('Adresse IP publique : $publicIpAddress');
+        // Stockez les adresses IP dans votre modèle utilisateur
+        // Vous pouvez les stocker dans des variables dans votre modèle ou les utiliser directement
+      } else {
+        print('Failed to get IP address');
+      }
+    } catch (e) {
+      print('Exception while getting IP address: $e');
+    }
+  }
 
   // Connexion
   Future<void> loginUser(BuildContext context) async {
     try {
-      var url = Uri.parse('http://localhost:8000/users/login/');
+      var url = Uri.parse('http://192.168.1.20:8000/users/login/');
       var headers = {'Content-Type': 'application/json'};
       var body = json.encode({
         'cin': _cinController.text,
@@ -76,6 +96,7 @@ class UserModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         var userData = json.decode(response.body);
         await startSession();
+        await getUserIpAddress();
 
         firstName = userData['firstName'] ?? '';
         lastName = userData['lastName'] ?? '';
@@ -133,8 +154,8 @@ class UserModel extends ChangeNotifier {
 
   Future<void> registerUser(BuildContext context) async {
     try {
-      var userUrl = Uri.parse('http://localhost:8000/users/register/');
-      var profileUrl = Uri.parse('http://localhost:8000/profil/create/');
+      var userUrl = Uri.parse('http://192.168.1.20:8000/users/register/');
+      var profileUrl = Uri.parse('http://192.168.1.20:8000/profil/create/');
 
       var headers = {'Content-Type': 'application/json'};
       var userBody = json.encode({
@@ -221,7 +242,7 @@ class UserModel extends ChangeNotifier {
       print('CIN est null');
       return;
     }
-    String apiUrl = 'http://localhost:8000/profil/profiles/cin/$cin';
+    String apiUrl = 'http://192.168.1.20:8000/profil/profiles/cin/$cin';
 
     try {
       var response = await http.get(Uri.parse(apiUrl));

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:mira/SplashScreen.dart';
+import 'package:mira/Constants/SplashScreen.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -14,6 +14,6 @@ void main() {
       Locale('ar', 'AR'),
     ],
     debugShowCheckedModeBanner: false,
-    home: SplashScreen(),
+    home: SplashScreen(), // Passer l'instance de ClientModel
   ));
 }

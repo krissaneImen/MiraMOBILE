@@ -38,7 +38,7 @@ class _CalenriersWidgetState extends State<ManifestationsWidget> {
     String statut = widget.userModel.statut;
 
     String apiUrl =
-        'http://192.168.1.21:8000/manifestation/manifestations/${statut}';
+        'http://172.16.26.109:8000/manifestation/manifestations/${statut}';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -78,7 +78,7 @@ class _CalenriersWidgetState extends State<ManifestationsWidget> {
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Manifestations',
+          'Liste de manifestations',
           style: FlutterFlowTheme.of(context).titleLarge,
         ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,

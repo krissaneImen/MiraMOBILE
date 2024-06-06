@@ -4,43 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:mira/Provider/user_model.dart';
-import 'package:mira/Screens/MenuScreens/Photocopie.dart';
 import 'package:mira/Screens/MenuScreens/Services.dart';
+import 'package:mira/Screens/Marquage.dart';
+import 'package:mira/Utils/CustomAlertDialog.dart'; // Importez la page Marquage
 
-class PhotocopieWidget extends StatefulWidget {
+class SeancesWidget extends StatefulWidget {
   final UserModel userModel;
 
-  const PhotocopieWidget({Key? key, required this.userModel}) : super(key: key);
+  const SeancesWidget({Key? key, required this.userModel}) : super(key: key);
 
   @override
-  State<PhotocopieWidget> createState() => _PhotocopieWidgetState();
+  State<SeancesWidget> createState() => _SeancesWidgetState();
 }
 
-class _PhotocopieWidgetState extends State<PhotocopieWidget> {
+class _SeancesWidgetState extends State<SeancesWidget> {
   bool _isLoading = true;
-  List<dynamic> photocopies = [];
+  List<dynamic> seances = [];
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<String> imageUrls = [
-    'https://images.unsplash.com/photo-1614332625575-6bef549fcc7b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwyfHxjb3B5fGVufDB8fHx8MTcxNTAwNjgwM3ww&ixlib=rb-4.0.3&q=80&w=1080',
-    'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwxfHxjb3BpZXJ8ZW58MHx8fHwxNzE1MDA3MTI5fDA&ixlib=rb-4.0.3&q=80&w=1080',
-    'https://images.unsplash.com/photo-1666101041092-468eb2818c87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHwzfHxjb3BpZXJ8ZW58MHx8fHwxNzE1MDA3MTI5fDA&ixlib=rb-4.0.3&q=80&w=1080',
-    'https://images.unsplash.com/photo-1612814266697-e5814f3063cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHNlYXJjaHw1fHxjb3BpZXJ8ZW58MHx8fHwxNzE1MDA3MTI5fDA&ixlib=rb-4.0.3&q=80&w=1080'
-  ];
 
   @override
   void initState() {
     super.initState();
-    if (widget.userModel.statut.toLowerCase() == 'enseignant') {
-      _fetchPhotocopieDataForEnseignant();
-    } else if (widget.userModel.statut.toLowerCase() == 'administratif') {
-      _fetchPhotocopieListData();
-    }
+    _fetchSeancesData();
   }
 
-  Future<void> _fetchPhotocopieDataForEnseignant() async {
+  Future<void> _fetchSeancesData() async {
     String cin = widget.userModel.cin;
     String apiUrl =
-        'http://192.168.1.20:8000/photocopie/photocopie_by_cin/${cin}';
+        'http://192.168.1.20:8000/emploiProf/get_seances_by_cin/$cin';
     try {
       var response = await http.get(
         Uri.parse(apiUrl),
@@ -55,7 +46,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
       if (response.statusCode == 200) {
         var data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
-          photocopies = data;
+          seances = data;
           _isLoading = false;
         });
       } else {
@@ -72,49 +63,39 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
     }
   }
 
-  Future<void> _fetchPhotocopieListData() async {
-    String apiUrl = 'http://192.168.1.20:8000/photocopie/get_photocopie_list/';
-    try {
-      var response = await http.get(
-        Uri.parse(apiUrl),
-        headers: {
-          'Accept-Charset': 'utf-8',
-        },
-      );
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        var data = json.decode(utf8.decode(response.bodyBytes));
-        setState(() {
-          photocopies = data;
-          _isLoading = false;
-        });
-      } else {
-        print('Failed to load the data: ${response.statusCode}');
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error loading the data: $e');
-      setState(() {
-        _isLoading = false;
-      });
+  bool isCurrentSession(String horaire) {
+    DateTime now = DateTime.now();
+    // Parse the session time in the format "HH:mm - HH:mm"
+    List<String> parts = horaire.split(' - ');
+    if (parts.length == 2) {
+      DateTime startTime = _parseTime(parts[0]);
+      DateTime endTime = _parseTime(parts[1]);
+      return now.isAfter(startTime) && now.isBefore(endTime);
     }
+    return false;
   }
 
-  void navigateToPhotocopiePage(String photocopieId, String idDemande) {
-    print('Photocopie ID: $photocopieId , idDemande : $idDemande');
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DetailsPhotocopieWidget(
-          photocopieId: photocopieId,
-          idDemande: idDemande,
-          userModel: widget.userModel,
-        ),
-      ),
+  DateTime _parseTime(String time) {
+    DateTime now = DateTime.now();
+    List<String> timeParts = time.split(':');
+    int hour = int.parse(timeParts[0]);
+    int minute = int.parse(timeParts[1]);
+    return DateTime(now.year, now.month, now.day, hour, minute);
+  }
+
+  void _showAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          // Utilisez votre widget CustomAlertDialog ici
+          title: "Horaire non valide",
+          content: "La séance ne commence pas maintenant.",
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        );
+      },
     );
   }
 
@@ -124,7 +105,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Demandes de photocopie',
+          'Séances',
           style: FlutterFlowTheme.of(context).titleLarge,
         ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
@@ -140,11 +121,13 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
             size: 30,
           ),
           onPressed: () {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Services(
-                userModel: widget.userModel,
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => Services(
+                  userModel: widget.userModel,
+                ),
               ),
-            ));
+            );
           },
         ),
         centerTitle: false,
@@ -167,15 +150,27 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: photocopies.length,
+                    itemCount: seances.length,
                     itemBuilder: (context, index) {
-                      if (index < photocopies.length) {
-                        var photocopie = photocopies[index];
-                        String imageUrl = imageUrls[index % imageUrls.length];
+                      if (index < seances.length) {
+                        var seance = seances[index];
                         return GestureDetector(
                           onTap: () {
-                            navigateToPhotocopiePage(photocopies[index]['id'],
-                                photocopies[index]['idDemande']);
+                            if (isCurrentSession(seance['horaire'])) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => Marquage(
+                                    userModel: widget.userModel,
+                                    groupe: seance['groupe'],
+                                    matiere: seance[
+                                        'matiere'], // Pass the matiere parameter here
+                                  ),
+                                ),
+                              );
+                            } else {
+                              _showAlert(
+                                  context); // Afficher une alerte si l'horaire n'est pas en cours
+                            }
                           },
                           child: Padding(
                             padding:
@@ -189,10 +184,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                   BoxShadow(
                                     blurRadius: 3,
                                     color: Color(0x411D2429),
-                                    offset: Offset(
-                                      0.0,
-                                      1,
-                                    ),
+                                    offset: Offset(0.0, 1),
                                   )
                                 ],
                                 borderRadius: BorderRadius.circular(8),
@@ -207,11 +199,10 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                           0, 1, 1, 1),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(6),
-                                        child: Image.network(
-                                          imageUrl,
-                                          width: 80,
-                                          height: 80,
-                                          fit: BoxFit.cover,
+                                        child: Icon(
+                                          Icons.calendar_today,
+                                          size: 80,
+                                          color: Colors.blue,
                                         ),
                                       ),
                                     ),
@@ -227,7 +218,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              photocopie['cour'] ?? '',
+                                              seance['matiere'] ?? '',
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .headlineSmall
@@ -240,7 +231,7 @@ class _PhotocopieWidgetState extends State<PhotocopieWidget> {
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(0, 4, 8, 0),
                                               child: AutoSizeText(
-                                                'Nombre de photocopies: ${photocopies[index]['nombreCopie']}',
+                                                'Horaire: ${seance['horaire']}\nSalle: ${seance['sale']}\nJour: ${seance['jourSemaine']}\nGroupe: ${seance['groupe']}',
                                                 textAlign: TextAlign.start,
                                                 style:
                                                     FlutterFlowTheme.of(context)

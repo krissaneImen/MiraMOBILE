@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +14,7 @@ import 'package:mira/Widgets/SignUpWidgets/CustomEmailField.dart';
 import 'package:mira/Widgets/SignUpWidgets/CustomPasswordField.dart';
 import 'package:mira/Widgets/SignUpWidgets/CustomPhoneNumberField.dart';
 import 'package:mira/Widgets/SignUpWidgets/CustomTextFormField.dart';
+import 'package:http/http.dart' as http;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({Key? key}) : super(key: key);
@@ -34,7 +37,8 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
   late UserModel _model;
   String? _selectedRole; // Déclaration de la variable _selectedRole
   final _formKey = GlobalKey<FormState>();
-
+  List<dynamic> donnees = [];
+  bool _isLoading = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final animationsMap = AnimationHelper.animationsMap;
 
@@ -48,6 +52,51 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
         ),
       );
     });
+    fetchInstitutData();
+  }
+
+  Future<void> fetchInstitutData() async {
+    String apiUrl = 'http://192.168.1.20:8000/client/get_Institut/';
+    try {
+      var response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Accept-Charset': 'utf-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          donnees = data;
+          _isLoading = false;
+        });
+      } else {
+        print('Failed to load the data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading the data: $e');
+    }
+  }
+
+  Widget _buildLogoImage() {
+    try {
+      if (donnees.isNotEmpty && donnees[0].containsKey('logo')) {
+        // Essayer de charger l'image depuis les données
+        return Image.memory(
+          base64.decode(donnees[0]['logo']),
+          width: 200,
+          height: 70,
+        );
+      }
+    } catch (e) {
+      print('Failed to load image: $e');
+    }
+    return Image.asset(
+      'assets/Instituts.jpeg',
+      width: 200,
+      height: 70,
+    );
   }
 
   void showSnackBar(String message) {
@@ -102,10 +151,7 @@ class _SignupPageState extends State<SignupPage> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: AlignmentDirectional(0, 0),
-                    child: Image.asset(
-                      'assets/isetlogo.png',
-                      fit: BoxFit.contain,
-                    ),
+                    child: _buildLogoImage(),
                   ),
                 ),
                 Padding(

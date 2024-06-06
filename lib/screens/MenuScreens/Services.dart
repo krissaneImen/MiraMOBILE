@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterflow_ui/flutterflow_ui.dart';
 import 'package:mira/Provider/user_model.dart';
+import 'package:mira/Screens/Absences.dart';
 import 'package:mira/Screens/MenuScreens/DemandeAttest.dart';
 import 'package:mira/Screens/MenuScreens/photoCopies.dart';
 import 'package:mira/Screens/acceuil.dart';
@@ -57,14 +58,15 @@ class _ServicesState extends State<Services> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Affichage conditionnel pour les relevés de notes
-              if (widget.userModel.statut == 'Etudiant')
+              // Autres widgets sans condition
+              if (widget.userModel.statut.toLowerCase() == 'etudiant' ||
+                  widget.userModel.statut.toLowerCase() == 'enseignant')
                 GestureDetector(
                   onTap: () {
-                    // Logique pour Relevés de notes
+                    // Logique pour Emplois de temps
                   },
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
                     child: Container(
                       width: double.infinity,
                       height: 50,
@@ -89,7 +91,7 @@ class _ServicesState extends State<Services> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Relevés de notes',
+                              'Emploi de temps',
                               style: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
@@ -108,58 +110,7 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              // Autres widgets sans condition
-
-              GestureDetector(
-                onTap: () {
-                  // Logique pour Emplois de temps
-                },
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 12),
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 3,
-                          color: Color(0x33000000),
-                          offset: Offset(
-                            0,
-                            1,
-                          ),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Emploi de temps',
-                            style: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  letterSpacing: 0,
-                                ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            size: 24,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              if (widget.userModel.statut == 'Etudiant')
+              if (widget.userModel.statut.toLowerCase() == 'etudiant')
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -215,7 +166,7 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              if (widget.userModel.statut == 'Etudiant')
+              if (widget.userModel.statut.toLowerCase() == 'etudiant')
                 GestureDetector(
                   onTap: () {
                     // Logique pour Avis de rattrapages
@@ -265,57 +216,8 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              if (widget.userModel.statut == 'Etudiant')
-                GestureDetector(
-                  onTap: () {
-                    // Logique pour Relevés de notes
-                  },
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3,
-                            color: Color(0x33000000),
-                            offset: Offset(
-                              0,
-                              1,
-                            ),
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Relevés de notes',
-                              style: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              if (widget.userModel.statut == 'Etudiant')
+
+              if (widget.userModel.statut.toLowerCase() == 'etudiant')
                 GestureDetector(
                   onTap: () {
                     // Logique pour Mes absences
@@ -365,8 +267,8 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -422,8 +324,8 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
                 GestureDetector(
                   onTap: () {
                     // Logique pour Mes absences
@@ -473,58 +375,59 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-
-              GestureDetector(
-                onTap: () {
-                  // Logique pour Mes absences
-                },
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).primaryBackground,
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 3,
-                          color: Color.fromARGB(51, 4, 4, 4),
-                          offset: Offset(
-                            0,
-                            1,
-                          ),
-                        )
-                      ],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Attestations',
-                            style: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  fontFamily: 'Readex Pro',
-                                  letterSpacing: 0,
-                                ),
-                          ),
-                          Icon(
-                            Icons.chevron_right_rounded,
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            size: 24,
-                          ),
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
+                GestureDetector(
+                  onTap: () {
+                    // Logique pour Mes absences
+                  },
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).primaryBackground,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3,
+                            color: Color.fromARGB(51, 4, 4, 4),
+                            offset: Offset(
+                              0,
+                              1,
+                            ),
+                          )
                         ],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Attestations',
+                              style: FlutterFlowTheme.of(context)
+                                  .labelMedium
+                                  .override(
+                                    fontFamily: 'Readex Pro',
+                                    letterSpacing: 0,
+                                  ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: FlutterFlowTheme.of(context).primaryText,
+                              size: 24,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
                 GestureDetector(
                   onTap: () {
                     // Logique pour Mes absences
@@ -574,8 +477,8 @@ class _ServicesState extends State<Services> {
                     ),
                   ),
                 ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
+              if (widget.userModel.statut.toLowerCase() == 'enseignant' ||
+                  widget.userModel.statut.toLowerCase() == 'administratif')
                 GestureDetector(
                   onTap: () {
                     // Logique pour Mes absences
@@ -607,108 +510,6 @@ class _ServicesState extends State<Services> {
                           children: [
                             Text(
                               'Avis de test',
-                              style: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
-                GestureDetector(
-                  onTap: () {
-                    // Logique pour Mes absences
-                  },
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3,
-                            color: Color.fromARGB(51, 4, 4, 4),
-                            offset: Offset(
-                              0,
-                              1,
-                            ),
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Absences collectives',
-                              style: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    fontFamily: 'Readex Pro',
-                                    letterSpacing: 0,
-                                  ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              if (widget.userModel.statut == 'Enseignant' ||
-                  widget.userModel.statut == 'Administratif')
-                GestureDetector(
-                  onTap: () {
-                    // Logique pour Mes absences
-                  },
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 8),
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: FlutterFlowTheme.of(context).primaryBackground,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3,
-                            color: Color.fromARGB(51, 4, 4, 4),
-                            offset: Offset(
-                              0,
-                              1,
-                            ),
-                          )
-                        ],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Conseils scientifiques',
                               style: FlutterFlowTheme.of(context)
                                   .labelMedium
                                   .override(
