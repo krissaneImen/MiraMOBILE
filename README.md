@@ -1,72 +1,80 @@
-Mira Flutter Application
- 
-Overview
-Mira is a new Flutter project designed as an administrative management system for higher education institutions. This README file will guide you through the necessary steps to get the application up and running on your local machine.
+Mira Application Flutter
 
-Prerequisites
-To build and run this application, ensure you have the following installed on your system:
-- Flutter: Version 3.19.6
-- Java: Version 17 (required for Android development)
+Aperçu
+Mira est un nouveau projet Flutter conçu comme un système de gestion administrative pour les établissements d'enseignement supérieur. Ce fichier README vous guidera à travers les étapes nécessaires pour mettre l'application en marche sur votre machine locale.
+
+ Prérequis
+Pour construire et exécuter cette application, assurez-vous d'avoir les éléments suivants installés sur votre système :
+- Flutter : Version 3.19.6
+- Java : Version 17 (nécessaire pour le développement Android)
 
 Installation
 
-Flutter Installation
-1. Download and install Flutter 3.19.6 from the [official Flutter installation guide](https://docs.flutter.dev/get-started/install?_gl=1*1hcskrh*_up*MQ..&gclid=CjwKCAjwvIWzBhAlEiwAHHWgvfpcP7uIt-L3EccS-DB0Q4f6dxyMEd3noND_gnSc7rRql9jM88i9fxoCD08QAvD_BwE&gclsrc=aw.ds).
-2. Ensure that Flutter is correctly installed by running:
+**Installation de Flutter**
+1. Téléchargez et installez Flutter 3.19.6 depuis le [guide officiel d'installation de Flutter](https://docs.flutter.dev/get-started/install?_gl=1*1hcskrh*_up*MQ..&gclid=CjwKCAjwvIWzBhAlEiwAHHWgvfpcP7uIt-L3EccS-DB0Q4f6dxyMEd3noND_gnSc7rRql9jM88i9fxoCD08QAvD_BwE&gclsrc=aw.ds).
+2. Assurez-vous que Flutter est correctement installé en exécutant :
 
    flutter --version
-   
+  
 
- Java Installation
-1. Download and install Java 17 from the [official Oracle website](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) or your preferred package manager.
-2. Verify the installation by running:
-   
+Installation de Java**
+1. Téléchargez et installez Java 17 depuis le [site officiel d'Oracle](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) ou votre gestionnaire de paquets préféré.
+2. Vérifiez l'installation en exécutant :
+
+
    java -version
   
 
- Project Setup
-1. Clone the repository:
- 
+**Configuration du projet**
+1. Clonez le dépôt :
+
+
    git clone https://github.com/yourusername/mira.git
    cd mira
-   
-2. Install the dependencies:
+
+
+2. Installez les dépendances :
+
    
    flutter pub get
+  
 
+ Exécution de l'application
 
-Running the Application
+Android
+1. Assurez-vous d'avoir un appareil Android connecté ou un émulateur en cours d'exécution.
+2. Exécutez l'application :
 
- Android
-1. Ensure you have an Android device connected or an emulator running.
-2. Run the application:
    
    flutter run
-
+   
 
 iOS
-1. Ensure you have Xcode installed and setup.
-2. Open the project in Xcode:
+1. Assurez-vous d'avoir installé et configuré Xcode.
+2. Ouvrez le projet dans Xcode :
+
    
    open ios/Runner.xcworkspace
    
-3. Build and run the application from Xcode.
 
- Project Structure
- 
+3. Compilez et exécutez l'application depuis Xcode.
+
+Structure du projet
+
+
 mira/
 │
-├── android/                # Android specific code
-├── assets/                 # Application assets
-├── ios/                    # iOS specific code
-├── lib/                    # Dart source code
-├── test/                   # Unit and widget tests
-├── pubspec.yaml            # Project dependencies
-└── README.md               # Project documentation
+├── android/                # Code spécifique à Android
+├── assets/                 # Ressources de l'application
+├── ios/                    # Code spécifique à iOS
+├── lib/                    # Code source Dart
+├── test/                   # Tests unitaires et de widgets
+├── pubspec.yaml            # Dépendances du projet
+└── README.md               # Documentation du projet
 
 
-Dependencies
-The project uses a variety of packages to enhance functionality:
+Dépendances
+Le projet utilise une variété de packages pour améliorer ses fonctionnalités :
 
 - auto_size_text: ^3.0.0
 - cached_network_image: ^3.2.1
@@ -118,20 +126,20 @@ The project uses a variety of packages to enhance functionality:
 - file_picker: ^7.0.2
 - badges: ^3.1.2
 
-Development and Testing
-- To run tests:
+Développement et tests
+- Pour exécuter les tests :
 
+  
   flutter test
+  
 
-
-Additional Resources
-- [Flutter Documentation](https://docs.flutter.dev/)
-- [Dart Documentation](https://dart.dev/guides)
+ Ressources supplémentaires
+- [Documentation Flutter](https://docs.flutter.dev/)
+- [Documentation Dart](https://dart.dev/guides)
 
 Contribution
-If you wish to contribute to this project, please fork the repository and submit a pull request. Ensure that your code adheres to the project's coding standards and includes tests for new functionality.
-
+Si vous souhaitez contribuer à ce projet, veuillez forker le dépôt et soumettre une pull request. Assurez-vous que votre code respecte les normes de codage du projet et inclut des tests pour les nouvelles fonctionnalités.
 
 ---
 
-Happy coding!
+Bon codage !
